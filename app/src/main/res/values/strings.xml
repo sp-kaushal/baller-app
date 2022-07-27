@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DeliveryProjectStructureDemo</string>
+    <string name="dialog_button_confirm">Confirm</string>
+    <string name="dialog_button_cancel">Cancel</string>
+</resources>
