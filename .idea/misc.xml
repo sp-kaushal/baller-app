@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="../../../../layout/compose-model-1658900925925.xml" value="0.22" />
+        <entry key="../../../../layout/compose-model-1658902654020.xml" value="0.67" />
+        <entry key="../../../../layout/compose-model-1658903174695.xml" value="0.75" />
+        <entry key="../../../../layout/compose-model-1658906913325.xml" value="0.2872727272727273" />
+        <entry key="../../../../layout/compose-model-1658907306944.xml" value="1.1" />
+        <entry key="../../../../layout/compose-model-1658907837090.xml" value="0.75" />
+        <entry key="../../../../layout/compose-model-1658915178590.xml" value="0.9" />
+        <entry key="../../../../layout/compose-model-1658915178599.xml" value="0.67" />
+        <entry key="../../../../layout/compose-model-1658915464150.xml" value="0.7011494252873564" />
+        <entry key="../../../../layout/compose-model-1658915503003.xml" value="0.8827160493827161" />
+        <entry key="../../../../layout/compose-model-1658915651227.xml" value="0.21" />
+        <entry key="../../../../layout/compose-model-1658915832368.xml" value="0.15" />
+        <entry key="../../../../layout/compose-model-1658915877301.xml" value="0.33" />
+        <entry key="../../../../layout/compose-model-1658915877470.xml" value="0.16298527443105756" />
+        <entry key="../../../../layout/compose-model-1658916230019.xml" value="0.33" />
+        <entry key="../../../../layout/compose-model-1658916240898.xml" value="0.9745454545454545" />
+        <entry key="../../../../layout/compose-model-1658916271142.xml" value="0.67" />
+        <entry key="../../../../layout/compose-model-1658916569653.xml" value="1.0" />
+        <entry key="../../../../layout/compose-model-1658916772126.xml" value="0.22" />
+        <entry key="../../../../layout/compose-model-1658917012670.xml" value="0.22" />
+        <entry key="../../../../layout/compose-model-1658919822517.xml" value="0.5" />
+      </map>
+    </option>
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>

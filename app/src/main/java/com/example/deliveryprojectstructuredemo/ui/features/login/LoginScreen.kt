@@ -1,8 +1,10 @@
 package com.example.deliveryprojectstructuredemo.ui.features.login
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -15,8 +17,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.deliveryprojectstructuredemo.common.Route.SIGN_UP_SCREEN
-import com.example.deliveryprojectstructuredemo.ui.LocalSpacing
-import com.example.deliveryprojectstructuredemo.ui.spacing
+import com.example.deliveryprojectstructuredemo.ui.features.components.AppButton
+import com.example.deliveryprojectstructuredemo.ui.features.components.AppDivider
+import com.example.deliveryprojectstructuredemo.ui.features.components.AppText
+import com.example.deliveryprojectstructuredemo.ui.theme.spacing
 
 @Composable
 fun LoginScreen(navController: NavController, vm: LoginViewModel = hiltViewModel()) {
@@ -65,6 +69,7 @@ fun LoginScreen(navController: NavController, vm: LoginViewModel = hiltViewModel
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LoginFields(
     email: String,
@@ -82,7 +87,7 @@ fun LoginFields(
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Please login")
+        AppText("Please login", modifier = Modifier.background(color = MaterialTheme.colors.background))
 
         OutlinedTextField(
             value = email,
@@ -98,7 +103,7 @@ fun LoginFields(
             visualTransformation = PasswordVisualTransformation()
         )
 
-        Button(onClick = {
+        AppButton(onClick = {
             onLoginClick(email)
         }, modifier = Modifier.width(300.dp)) {
             Text("Login")

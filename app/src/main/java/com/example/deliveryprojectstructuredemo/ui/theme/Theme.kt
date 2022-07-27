@@ -7,9 +7,9 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
-import com.example.deliveryprojectstructuredemo.ui.LocalSpacing
-import com.example.deliveryprojectstructuredemo.ui.Spacing
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorPalette = darkColors(
     primary = Purple200,
@@ -66,6 +66,15 @@ fun DeliveryProjectStructureDemoTheme(
         DarkColorPalette
     } else {
         LightColorPalette
+    }
+    val sysUiController = rememberSystemUiController()
+    val useDarkIcons = MaterialTheme.colors.isLight
+
+    SideEffect {
+        sysUiController.setStatusBarColor(
+            color = Color.Transparent,
+            darkIcons = useDarkIcons
+        )
     }
 
  /*   val colors = when (darkTheme) {

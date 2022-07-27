@@ -1,4 +1,4 @@
-package com.example.deliveryprojectstructuredemo.ui
+package com.example.deliveryprojectstructuredemo.ui.theme
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -15,6 +15,7 @@ data class Spacing(
     val large: Dp = 32.dp,
     val extraLarge: Dp = 64.dp,
 )
+
 val LocalSpacing = compositionLocalOf { Spacing() }
 
 val MaterialTheme.spacing: Spacing
