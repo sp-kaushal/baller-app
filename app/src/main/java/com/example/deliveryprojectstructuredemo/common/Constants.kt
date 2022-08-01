@@ -6,6 +6,7 @@ object Constants {
 }
 
 object Route {
+    const val WELCOME_SCREEN = "welcomeScreen"
     const val LOGIN_SCREEN = "loginScreen"
     const val SIGN_UP_SCREEN = "signupScreen"
 }

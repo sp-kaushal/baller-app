@@ -11,16 +11,21 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
+//import com.google.accompanist.systemuicontroller.rememberSystemUiController
+
 private val DarkColorPalette = darkColors(
     primary = Purple200,
     primaryVariant = Purple700,
-    secondary = Teal200
+    secondary = Teal200,
+//    onBackground = heading2OnDarkColor
 )
 
 private val LightColorPalette = lightColors(
     primary = Purple500,
     primaryVariant = Purple700,
-    secondary = Teal200
+    secondary = Teal200,
+    onBackground = heading2Color,
+    onSurface = heading1Color
 
     /* Other default colors to override
     background = Color.White,
@@ -68,13 +73,11 @@ fun DeliveryProjectStructureDemoTheme(
         LightColorPalette
     }
     val sysUiController = rememberSystemUiController()
-    val useDarkIcons = MaterialTheme.colors.isLight
-
     SideEffect {
-        sysUiController.setStatusBarColor(
-            color = Color.Transparent,
-            darkIcons = useDarkIcons
-        )
+           sysUiController.setStatusBarColor(
+               color = Color.Transparent,
+               darkIcons = !darkTheme
+           )
     }
 
  /*   val colors = when (darkTheme) {

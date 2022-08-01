@@ -14,6 +14,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -61,7 +65,21 @@ fun AppCard(
 private fun ButtonPreview() {
     DeliveryProjectStructureDemoTheme() {
         AppCard(onClick = { }) {
-            Text(text = "AppCard", modifier = Modifier.padding(16.dp))
+//            Text(text = "AppCard", modifier = Modifier.padding(16.dp))
+
+            Text(
+                buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = Color.Blue)) {
+                        append("H")
+                    }
+                    append("ello ")
+
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Color.Red)) {
+                        append("W")
+                    }
+                    append("orld")
+                }
+            )
         }
     }
 }

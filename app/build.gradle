@@ -68,5 +68,9 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
 
    implementation 'com.google.accompanist:accompanist-systemuicontroller:0.23.1'
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+    implementation "androidx.compose.material:material-icons-extended:$compose_version"
+
+
 
 }

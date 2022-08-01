@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -32,10 +33,10 @@ fun AppButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ButtonElevation? = ButtonDefaults.elevation(),
-    shape: Shape = MaterialTheme.shapes.small,
+    shape: Shape = RoundedCornerShape(12.dp),
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    contentPadding: PaddingValues = PaddingValues(24.dp, vertical = 15.dp),
     content: @Composable RowScope.() -> Unit
 ) {
     val contentColor by colors.contentColor(enabled)
@@ -89,12 +90,16 @@ private fun ButtonPreview() {
 @Composable
 private fun RectangleButtonPreview() {
     DeliveryProjectStructureDemoTheme() {
+
+        Surface() {
             AppButton(
                 onClick = {}, shape = RectangleShape
             ) {
                 Text(text = "AppButton")
 
+            }
         }
+
 
     }
 }
