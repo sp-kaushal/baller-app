@@ -85,7 +85,13 @@
         <entry key="../../../../layout/compose-model-1659353468901.xml" value="1.4954128440366972" />
         <entry key="../../../../layout/compose-model-1659353477972.xml" value="0.3838304552590267" />
         <entry key="../../../../layout/compose-model-1659360350818.xml" value="0.7011494252873564" />
+        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_facbook.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_google.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_google_lake.xml" value="0.11" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_login.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_sign_up.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_welcome.xml" value="0.133" />
       </map>
     </option>

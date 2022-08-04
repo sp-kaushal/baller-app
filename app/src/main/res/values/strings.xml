@@ -23,12 +23,15 @@
     <string name="create_now"> Create Now</string>
     <string name="sign_up">Sign Up</string>
     <string name="create_free_account_and_join_us">Create a free account and join us!</string>
-    <string name="your_name">Your Name</string>
-    <string name="enter_your_name">Enter your Name</string>
+    <string name="your_name">Full Name</string>
+    <string name="enter_your_name">Enter your full Name</string>
     <string name="create_account">Create Account</string>
     <string name="your_password">Enter your password</string>
     <string name="by_creating_an_accound_you_agree">"By creating an account you agree with all our "</string>
     <string name="terms_of_service">Terms of Service</string>
     <string name="and_our">and our</string>
     <string name="privacy_policy">Privacy Policy</string>
+    <string name="generic_error">Generic Error</string>
+    <string name="email_error">Enter a valid Email</string>
+    <string name="password_error">Password Error</string>
 </resources>
