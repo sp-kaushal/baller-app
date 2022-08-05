@@ -48,6 +48,7 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
                     _loginUiState.value =
                         loginUiState.value.copy(errorMessage = "Password must have at least eight characters with a lowercase letter, an uppercase letter and a number")
                 } else {
+
                     login()
                 }
             }
