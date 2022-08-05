@@ -138,7 +138,7 @@ fun LoginScreen(navController: NavController, vm: LoginViewModel = hiltViewModel
                     modifier = Modifier
                         .align(Alignment.End)
                         .clickable {
-
+                            navController.navigate(Route.FORGOT_PASSWORD_SCREEN)
                         }
                 )
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))

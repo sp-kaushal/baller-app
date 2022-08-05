@@ -18,6 +18,7 @@
     <string name="password">Password</string>
     <string name="create_password">Create Password</string>
     <string name="forgot_password">Forgot Password?</string>
+    <string name="forgot_password_heading">Forgot Password</string>
     <string name="or_login_with">Or Login With</string>
     <string name="dont_have_account">Don\'t have account?  </string>
     <string name="create_now"> Create Now</string>
@@ -34,4 +35,17 @@
     <string name="generic_error">Generic Error</string>
     <string name="email_error">Enter a valid Email</string>
     <string name="password_error">Password Error</string>
+    <string name="forgot_password_subtitle">Enter registered e-mail to recive password reset instruction.</string>
+    <string name="send">Send</string>
+    <string name="back_to_login">Back To Login</string>
+    <string name="otp_verifcation">OTP Verification</string>
+    <string name="please_enter_4_digit_code">Please enter the 4 digit code sent to %1$s </string>
+    <string name="verify">Verify</string>
+    <string name="resend_code">Resend Code</string>
+    <string name="create_new_password">Create New Password</string>
+    <string name="new_password_must_be_different">Your new password must be different from previously used password</string>
+    <string name="save">Save</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="re_enter_password">Re-enter Password</string>
 </resources>
