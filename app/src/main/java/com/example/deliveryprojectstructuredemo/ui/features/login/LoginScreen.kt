@@ -1,7 +1,9 @@
 package com.example.deliveryprojectstructuredemo.ui.features.login
 
 import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,6 +15,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
@@ -35,11 +40,39 @@ import com.example.deliveryprojectstructuredemo.ui.features.components.AppText
 import com.example.deliveryprojectstructuredemo.ui.features.components.SocialSection
 import com.example.deliveryprojectstructuredemo.ui.theme.DeliveryProjectStructureDemoTheme
 import com.example.deliveryprojectstructuredemo.ui.theme.spacing
+import com.google.android.gms.common.api.ApiException
 
 @Composable
 fun LoginScreen(navController: NavController, vm: LoginViewModel = hiltViewModel()) {
     val loginState = vm.loginUiState.value
     val context = LocalContext.current
+
+    val state=vm.googleUser.observeAsState()
+    val user=state.value
+    val isError = rememberSaveable { mutableStateOf(false) }
+
+
+    val authResultLauncher =
+        rememberLauncherForActivityResult(contract = GoogleApiContract()) { task ->
+            try {
+                val gsa = task?.getResult(ApiException::class.java)
+
+                if (gsa != null) {
+                    vm.fetchSignInUser(gsa.email, gsa.displayName,gsa.id)
+                } else {
+                    isError.value = true
+                }
+            } catch (e: ApiException) {
+                Log.i("LoginScreen", "LoginScreen: ${e.toString()}")
+            }
+        }
+
+    user?.let {
+        vm.hideLoading()
+        Log.i("gsa", "gsa:$it ")
+        Toast.makeText(context, "$it", Toast.LENGTH_SHORT).show()
+    }
+
 
     loginState.let { state ->
         if (state.isLoading) {
@@ -158,7 +191,9 @@ fun LoginScreen(navController: NavController, vm: LoginViewModel = hiltViewModel
                     headerText = stringResource(id = R.string.or_login_with),
                     footerText1 = stringResource(id = R.string.dont_have_account),
                     footerText2 = stringResource(id = R.string.create_now),
-                    onGoogleClick = { /*TODO*/ },
+                    onGoogleClick = { vm.showLoading()
+                        authResultLauncher.launch(1)
+                    },
                     onFacebookClick = { /*TODO*/ },
                     onFooterClick = { navController.navigate(Route.SIGN_UP_SCREEN) })
 
