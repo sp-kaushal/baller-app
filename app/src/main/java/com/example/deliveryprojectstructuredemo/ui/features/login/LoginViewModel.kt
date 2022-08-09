@@ -5,7 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.deliveryprojectstructuredemo.common.ResultWrapper.*
+import com.delivery_app.core.model.RepositoryResult
 import com.example.deliveryprojectstructuredemo.common.isValidEmail
 import com.example.deliveryprojectstructuredemo.common.isValidPassword
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,16 +41,16 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
                 _passwordVisibility.value = event.showPassword
             }
             is LoginUIEvent.Submit -> {
-                if (!email.value.isValidEmail()) {
+            /*    if (!email.value.isValidEmail()) {
                     _loginUiState.value =
                         loginUiState.value.copy(errorMessage = "Please enter valid email")
                 } else if (!password.value.isValidPassword()) {
                     _loginUiState.value =
                         loginUiState.value.copy(errorMessage = "Password must have at least eight characters with a lowercase letter, an uppercase letter and a number")
-                } else {
+                } else {*/
 
                     login()
-                }
+//                }
             }
         }
     }
@@ -58,15 +58,15 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
     private fun login() {
         viewModelScope.launch {
             Log.i("LoginViewModel", "login: ")
-            _loginUiState.value = loginUiState.value.copy(isLoading = true)
+            _loginUiState.value = loginUiState.value.copy(isDataLoading = true)
 
-            val loginResponse =
+            val resp =
                 loginRepository.loginWithEmailAndPass(
                     email = email.value,
                     password = password.value
                 )
-            when (loginResponse) {
-                is NetworkError -> {
+            when (resp) {
+        /*        is NetworkError -> {
                     _loginUiState.value = loginUiState.value.copy(isLoading = false)
                     _loginUiState.value =
                         loginUiState.value.copy(errorMessage = loginResponse.toString())
@@ -77,8 +77,8 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
                     _loginUiState.value =
                         loginUiState.value.copy(errorMessage = "${loginResponse.code} ${loginResponse.message}")
 
-                }
-                is Success -> {
+                }*/
+  /*              is Success -> {
                     _loginUiState.value = loginUiState.value.copy(isLoading = false)
                     if (loginResponse.value.status == 200) {
                         _loginUiState.value =
@@ -90,9 +90,54 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
                         )
 
                     }
+                }*/
+                is RepositoryResult.Success -> {
+                        resp.data?.let {loginResponse->
+                            _loginUiState.value = loginUiState.value.copy(isDataLoading = false)
+
+                            if (loginResponse.status == 200) {
+                                _loginUiState.value =
+                                    loginUiState.value.copy(user = loginResponse.userInfo, isDataLoading = false, errorMessage = null)
+
+                            } else {
+                                _loginUiState.value = loginUiState.value.copy(
+                                    errorMessage = loginResponse.message ?: "Something went wrong"
+                                )
+                        }
                 }
             }
+
+                /*is GenericError -> {
+                    _loginUiState.value = loginUiState.value.copy(isLoading = false)
+                    _loginUiState.value =
+                        loginUiState.value.copy(errorMessage = "${loginResponse.code} ${loginResponse.message}")
+
+                }*/
+
+                is RepositoryResult.Error -> {
+/*                    if (resp.code == Constants.TWO_FACTOR_REQUIRED_CODE) {
+                        _uiEvent.send(UiEvent.GenerateOtp)
+                        _state.value = LoginState(
+                            user = null,
+                            isDataLoading = false,
+                            errorMessage = null
+                        )
+                    } else {
+                        _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString(resp.exception)))
+                        _state.value = LoginState(
+                            user = null,
+                            isDataLoading = false,
+                            errorMessage = null
+                        )
+                    }*/
+//                    _loginUiState.value = loginUiState.value.copy(isLoading = false)
+                    _loginUiState.value =
+                        loginUiState.value.copy(errorMessage = "${resp.exception}", isDataLoading = false)
+                }
+
+
         }
     }
 }
+    }
 

@@ -3,6 +3,7 @@ package com.example.deliveryprojectstructuredemo.ui.features.sign_up
 import com.example.deliveryprojectstructuredemo.common.AppConstants
 import com.example.deliveryprojectstructuredemo.common.ResultWrapper
 import com.example.deliveryprojectstructuredemo.common.safeApiCall
+import com.example.deliveryprojectstructuredemo.data.UserStorage
 import com.example.deliveryprojectstructuredemo.data.request.LoginRequest
 import com.example.deliveryprojectstructuredemo.data.request.SignUpRequest
 import com.example.deliveryprojectstructuredemo.data.response.GoogleLoginResponse
@@ -39,7 +40,7 @@ class SignUpRepoImpl @Inject constructor(
                 email = email,
                 password = password,
                 deviceType = AppConstants.ANDROID,
-                deviceToken = "device_token"
+                deviceToken = UserStorage.deviceHesh
             )
         return safeApiCall(dispatcher) { service.userSignUp(requestBody) }
     }

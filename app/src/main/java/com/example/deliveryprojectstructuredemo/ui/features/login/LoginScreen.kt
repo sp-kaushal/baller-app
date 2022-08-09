@@ -1,6 +1,7 @@
 package com.example.deliveryprojectstructuredemo.ui.features.login
 
 import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -29,20 +30,29 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.deliveryprojectstructuredemo.R
 import com.example.deliveryprojectstructuredemo.common.Route
+import com.example.deliveryprojectstructuredemo.data.UserStorage
 import com.example.deliveryprojectstructuredemo.ui.features.components.AppButton
 import com.example.deliveryprojectstructuredemo.ui.features.components.AppOutlineTextField
 import com.example.deliveryprojectstructuredemo.ui.features.components.AppText
 import com.example.deliveryprojectstructuredemo.ui.features.components.SocialSection
 import com.example.deliveryprojectstructuredemo.ui.theme.DeliveryProjectStructureDemoTheme
 import com.example.deliveryprojectstructuredemo.ui.theme.spacing
+import timber.log.Timber
 
 @Composable
 fun LoginScreen(navController: NavController, vm: LoginViewModel = hiltViewModel()) {
     val loginState = vm.loginUiState.value
     val context = LocalContext.current
 
+    Log.i(
+        "LoginScreen",
+        "LoginScreen:${UserStorage.deviceHesh} ---- ${UserStorage.deviceDescription} "
+    )
+    Timber.i("Timber:" + UserStorage.deviceHesh + " ---- " + UserStorage.deviceDescription + " ")
+
+
     loginState.let { state ->
-        if (state.isLoading) {
+        if (state.isDataLoading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Center) {
                 CircularProgressIndicator()
             }

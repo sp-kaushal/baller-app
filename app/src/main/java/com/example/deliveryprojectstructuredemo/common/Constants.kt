@@ -1,5 +1,7 @@
 package com.example.deliveryprojectstructuredemo.common
 
+import com.google.gson.annotations.SerializedName
+
 object AppConstants {
     const val ANDROID="android"
     const val KEY_PASSWORD = "password"
@@ -16,7 +18,11 @@ object Route {
 }
 
 object ApiConstants {
-    const val BASE_URL="http://delivery-app.softprodigyphp.in"
+    const val first_name="first_name"
+    const val last_name="lastName"
+    const val mobile="mobile"
+    const val email="email"
+    const val token="token"
     const val LOGIN="/login"
     const val SIGNUP="/register"
 }
