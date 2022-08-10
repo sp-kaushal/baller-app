@@ -51,7 +51,7 @@ android {
         create("demo") {
             dimension = "delivery-app"
             buildConfigField("String", "API_SERVER", "\"http://delivery-app.softprodigyphp.in\"")
-            buildConfigField("String", "SERVER", "\"http://delivery-app.softprodigyphp.in")
+            buildConfigField("String", "SERVER", "\"http://delivery-app.softprodigyphp.in\"")
             buildConfigField("Integer", "CONNECT_TIMEOUT", "120")
             buildConfigField("Integer", "WRITE_TIMEOUT", "120")
             buildConfigField("Integer", "READ_TIMEOUT", "120")
