@@ -65,15 +65,14 @@ class VerifyOtpViewModel @Inject constructor(
                 is ResultWrapper.GenericError -> {
                     _verifyOtpUiState.value = verifyOtpUiState.value.copy(isLoading = false)
                     _verifyOtpUiState.value =
-                        verifyOtpUiState.value.copy(errorMessage = "${verifyOtpResponse.code} ${verifyOtpResponse.message}")
+                        verifyOtpUiState.value.copy(errorMessage = verifyOtpResponse.message)
                 }
                 is ResultWrapper.Success -> {
                     _verifyOtpUiState.value = verifyOtpUiState.value.copy(isLoading = false)
                     if (verifyOtpResponse.value.status == 200) {
                         _verifyOtpUiState.value =
                             verifyOtpUiState.value.copy(message = verifyOtpResponse.value.message)
-                    }
-                    else {
+                    } else {
                         _verifyOtpUiState.value = verifyOtpUiState.value.copy(
                             errorMessage = verifyOtpResponse.value.message
                                 ?: "Something went wrong"
@@ -82,5 +81,6 @@ class VerifyOtpViewModel @Inject constructor(
                 }
             }
         }
+
     }
 }

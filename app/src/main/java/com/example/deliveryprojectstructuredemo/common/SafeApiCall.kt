@@ -1,5 +1,6 @@
 package com.example.deliveryprojectstructuredemo.common
 
+import android.util.Log
 import com.example.deliveryprojectstructuredemo.data.ErrorResponse
 import com.google.gson.Gson
 import com.squareup.moshi.Moshi
@@ -30,7 +31,7 @@ suspend fun <T> safeApiCall(
                         errorBody,
                         ErrorResponse::class.java
                     )
-                    val message = gsonErrorBody.errors.toString()
+                    val message = gsonErrorBody.error.toString()
                     ResultWrapper.GenericError(code, message)
                 }
                 else -> {

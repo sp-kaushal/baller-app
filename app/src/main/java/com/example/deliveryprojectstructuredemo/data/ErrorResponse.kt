@@ -4,7 +4,8 @@ import com.google.gson.annotations.SerializedName
 
 data class ErrorResponse(
     @SerializedName("success") var success: Boolean? = null,
-    @SerializedName("errors") var errors: ArrayList<Errors> = arrayListOf()
+    @SerializedName("errors") var errors: ArrayList<Errors> = arrayListOf(),
+    @SerializedName("Error") var error: String? = null
 )
 
 data class Errors(
