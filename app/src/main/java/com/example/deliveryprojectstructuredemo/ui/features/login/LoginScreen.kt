@@ -14,11 +14,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,7 +59,7 @@ fun LoginScreen(
     var password by rememberSaveable { mutableStateOf("") }
     var passwordVisibility by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(key1 = Unit) {
         vm.uiEvent.collect { uiEvent ->
             when (uiEvent) {
                 is UiEvent.Success -> {
@@ -76,10 +73,11 @@ fun LoginScreen(
                 }
                 else -> Unit
             }
+        }
+    }
     val state=vm.googleUser.observeAsState()
     val user=state.value
     val isError = rememberSaveable { mutableStateOf(false) }
-
 
     val authResultLauncher =
         rememberLauncherForActivityResult(contract = GoogleApiContract()) { task ->
@@ -103,8 +101,8 @@ fun LoginScreen(
     }
 
 
-    loginState.let { state ->
-        if (state.isLoading) {
+/*    loginState.let { state ->
+        if (state.isDataLoading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Center) {
                 CircularProgressIndicator()
             }
@@ -122,7 +120,7 @@ fun LoginScreen(
             ).show()
             state.user = null
         }
-    }
+    }*/
 
     Box(
         modifier = Modifier
@@ -224,21 +222,14 @@ fun LoginScreen(
                 headerText = stringResource(id = R.string.or_login_with),
                 footerText1 = stringResource(id = R.string.dont_have_account),
                 footerText2 = stringResource(id = R.string.create_now),
-                onGoogleClick = onGoogleClick,
+                onGoogleClick = { onGoogleClick.invoke()
+                    vm.showLoading()
+                    authResultLauncher.launch(1)
+                                },
                 onFacebookClick = onFacebookClick,
                 onFooterClick = onCreateAccountClick
             )
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-                SocialSection(
-                    headerText = stringResource(id = R.string.or_login_with),
-                    footerText1 = stringResource(id = R.string.dont_have_account),
-                    footerText2 = stringResource(id = R.string.create_now),
-                    onGoogleClick = { vm.showLoading()
-                        authResultLauncher.launch(1)
-                    },
-                    onFacebookClick = { /*TODO*/ },
-                    onFooterClick = { navController.navigate(Route.SIGN_UP_SCREEN) })
-
         }
         if (loginState.isDataLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))

@@ -27,7 +27,9 @@ class GoogleApiContract : ActivityResultContract<Int, Task<GoogleSignInAccount>?
                 GoogleSignIn.getSignedInAccountFromIntent(intent)
             }
 
-            else -> null
+            else -> {
+                null
+            }
         }
     }
 }

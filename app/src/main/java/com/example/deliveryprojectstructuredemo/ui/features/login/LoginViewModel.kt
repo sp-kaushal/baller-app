@@ -24,23 +24,24 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(private var loginRepository: LoginRepository) :
-    ViewModel() {
-
+class LoginViewModel @Inject constructor(private var loginRepository: LoginRepository,application: Application) :
+    AndroidViewModel(application) {
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
+    private val _loginUiState = mutableStateOf(LoginUIState())
+    val loginUiState: State<LoginUIState> = _loginUiState
 
-class LoginViewModel @Inject constructor(private var loginRepository: LoginRepository,application: Application) :
-    AndroidViewModel(application) {
     private var _userState=MutableLiveData<GoogleUserModel>()
     val googleUser:LiveData<GoogleUserModel> =_userState
 
-    private var _loadingState=MutableLiveData(false)
-    val loading:LiveData<Boolean> =_loadingState
+/*    private var _loadingState=MutableLiveData(false)
+    val loading:LiveData<Boolean> =_loadingState*/
 
     fun fetchSignInUser(email:String?,name: String?,idToken:String?){
-        _loadingState.value=true
+//        _loadingState.value=true
+        _loginUiState.value = LoginUIState(isDataLoading = true)
+
         viewModelScope.launch {
             _userState.value= GoogleUserModel(
                 email=email,
@@ -48,17 +49,21 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
                 idToken =idToken,
             )
         }
-        _loadingState.value=false
+//        _loadingState.value=false
+        _loginUiState.value = LoginUIState(isDataLoading = false)
+
     }
     fun hideLoading(){
-        _loadingState.value=false
+//        _loadingState.value=false
+        _loginUiState.value = LoginUIState(isDataLoading = false)
     }
     fun showLoading(){
-        _loadingState.value=true
+//        _loadingState.value=true
+        _loginUiState.value = LoginUIState(isDataLoading = false)
+
     }
 
-    private val _loginUiState = mutableStateOf(LoginUIState())
-    val loginUiState: State<LoginUIState> = _loginUiState
+
 
     var userInfo: UserInfo? = null
         private set
@@ -81,7 +86,7 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
                     password = password
                 )
             when (loginResponse) {
-                is ResultWrapper.Success -> {
+                is ResultWrapper.Success ->{
                     loginResponse.value.let { response ->
 
                         if (response.status == 200) {
@@ -101,8 +106,9 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
                             )
                         }
                 }
+                }
                 is GenericError -> {
-                    _loginUiState.value = loginUiState.value.copy(isLoading = false)
+                    _loginUiState.value = loginUiState.value.copy(isDataLoading = false)
                     _loginUiState.value =
                         LoginUIState(
                             user=null,
@@ -126,4 +132,6 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
     }
 }
     }
+
+
 
