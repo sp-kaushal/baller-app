@@ -65,11 +65,13 @@ fun NavControllerComposable() {
         composable(route = FORGOT_PASSWORD_SCREEN) {
             ForgotPasswordScreen(navController = navController)
         }
-        composable(route = OTP_VERIFICATION_SCREEN) {
-            OTPVerificationScreen(navController = navController)
+        composable(route = "$OTP_VERIFICATION_SCREEN/{token}") {
+            val token = it.arguments?.getString("token")
+            OTPVerificationScreen(navController = navController, token = token!!)
         }
-        composable(route = NEW_PASSWORD_SCREEN) {
-            NewPasswordScreen(navController = navController)
+        composable(route = "$NEW_PASSWORD_SCREEN/{token}") {
+            val token = it.arguments?.getString("token")
+            NewPasswordScreen(navController = navController, token = token!!)
         }
     }
 }

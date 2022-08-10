@@ -4,6 +4,8 @@ import android.content.Context
 import com.example.deliveryprojectstructuredemo.BuildConfig
 import com.example.deliveryprojectstructuredemo.common.ApiConstants
 import com.example.deliveryprojectstructuredemo.network.APIService
+import com.example.deliveryprojectstructuredemo.ui.features.create_new_password.ResetPasswordRepoImpl
+import com.example.deliveryprojectstructuredemo.ui.features.create_new_password.ResetPasswordRepository
 import com.example.deliveryprojectstructuredemo.ui.features.forgot_password.ForgotPasswordRepoImpl
 import com.example.deliveryprojectstructuredemo.ui.features.forgot_password.ForgotPasswordRepository
 import com.example.deliveryprojectstructuredemo.ui.features.login.LoginRepository
@@ -99,5 +101,10 @@ class AppModule {
     @Singleton
     fun provideVerifyOtp(apiService: APIService): VerifyOtpRepository =
         VerifyOtpRepoImpl(apiService)
+
+    @Provides
+    @Singleton
+    fun provideResetPassword(apiService: APIService): ResetPasswordRepository =
+        ResetPasswordRepoImpl(apiService)
 
 }

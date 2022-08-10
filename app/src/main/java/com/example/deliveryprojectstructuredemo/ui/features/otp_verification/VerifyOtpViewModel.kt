@@ -33,7 +33,7 @@ class VerifyOtpViewModel @Inject constructor(
             }
 
             is VerifyOtpUIEvent.Submit -> {
-                if (otp.value.isNotEmpty()) {
+                if (otp.value.isEmpty()) {
                     _verifyOtpUiState.value =
                         verifyOtpUiState.value.copy(errorMessage = "Please enter valid OTP")
                 } else {
@@ -55,26 +55,25 @@ class VerifyOtpViewModel @Inject constructor(
                     otp = otp.value,
                     otpType = "email"
                 )
+
             when (verifyOtpResponse) {
                 is ResultWrapper.NetworkError -> {
                     _verifyOtpUiState.value = verifyOtpUiState.value.copy(isLoading = false)
                     _verifyOtpUiState.value =
                         verifyOtpUiState.value.copy(errorMessage = verifyOtpResponse.toString())
-
                 }
                 is ResultWrapper.GenericError -> {
                     _verifyOtpUiState.value = verifyOtpUiState.value.copy(isLoading = false)
-
                     _verifyOtpUiState.value =
-                        _verifyOtpUiState.value.copy(errorMessage = "${verifyOtpResponse.code} ${verifyOtpResponse.message}")
-
+                        verifyOtpUiState.value.copy(errorMessage = "${verifyOtpResponse.code} ${verifyOtpResponse.message}")
                 }
                 is ResultWrapper.Success -> {
                     _verifyOtpUiState.value = verifyOtpUiState.value.copy(isLoading = false)
                     if (verifyOtpResponse.value.status == 200) {
                         _verifyOtpUiState.value =
                             verifyOtpUiState.value.copy(message = verifyOtpResponse.value.message)
-                    } else {
+                    }
+                    else {
                         _verifyOtpUiState.value = verifyOtpUiState.value.copy(
                             errorMessage = verifyOtpResponse.value.message
                                 ?: "Something went wrong"

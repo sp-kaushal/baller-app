@@ -3,15 +3,19 @@ package com.example.deliveryprojectstructuredemo.network
 import com.example.deliveryprojectstructuredemo.common.ApiConstants
 import com.example.deliveryprojectstructuredemo.data.request.ForgotPasswordRequest
 import com.example.deliveryprojectstructuredemo.data.request.LoginRequest
+import com.example.deliveryprojectstructuredemo.data.request.ResetPasswordRequest
 import com.example.deliveryprojectstructuredemo.data.request.SignUpRequest
 import com.example.deliveryprojectstructuredemo.data.request.VerifyOtpRequest
 import com.example.deliveryprojectstructuredemo.data.response.ForgotPasswordResponse
 import com.example.deliveryprojectstructuredemo.data.response.LoginResponse
+import com.example.deliveryprojectstructuredemo.data.response.ResetPasswordResponse
 import com.example.deliveryprojectstructuredemo.data.response.SignUpResponse
 import com.example.deliveryprojectstructuredemo.data.response.VerifyOtpResponse
 import retrofit2.http.Body
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface APIService {
 
@@ -24,9 +28,15 @@ interface APIService {
     @POST(ApiConstants.FORGOT_PASSWORD)
     suspend fun forgotPassword(@Body forgotPasswordRequest: ForgotPasswordRequest): ForgotPasswordResponse
 
-    @POST(ApiConstants.VERIFY_OTP)
+    @POST("${ApiConstants.VERIFY_OTP}{token}")
     suspend fun verifyOtp(
-        @Header("Authorization") token: String,
+        @Path("token") token: String,
         @Body verifyOtpRequest: VerifyOtpRequest
     ): VerifyOtpResponse
+
+    @POST("${ApiConstants.RESET_PASS}{token}")
+    suspend fun resetPassword(
+        @Path("token") token: String,
+        @Body resetPasswordRequest: ResetPasswordRequest
+    ): ResetPasswordResponse
 }

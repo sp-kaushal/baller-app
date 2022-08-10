@@ -56,7 +56,7 @@ fun ForgotPasswordScreen(
                 Toast.LENGTH_SHORT
             ).show()
             state.message = null
-            navController.navigate(Route.OTP_VERIFICATION_SCREEN)
+            navController.navigate(Route.OTP_VERIFICATION_SCREEN + "/$verifyToken")
         }
 
         Box(

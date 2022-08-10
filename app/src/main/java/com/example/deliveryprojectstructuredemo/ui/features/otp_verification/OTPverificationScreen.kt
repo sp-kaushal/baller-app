@@ -1,5 +1,6 @@
 package com.example.deliveryprojectstructuredemo.ui.features.otp_verification
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -47,7 +48,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun OTPVerificationScreen(navController: NavController, vm: VerifyOtpViewModel = hiltViewModel()) {
+fun OTPVerificationScreen(
+    navController: NavController,
+    token: String,
+    vm: VerifyOtpViewModel = hiltViewModel()
+) {
 
     val (editValue, setEditValue) = remember { mutableStateOf("") }
     val otpLength = remember { 6 }
@@ -55,6 +60,7 @@ fun OTPVerificationScreen(navController: NavController, vm: VerifyOtpViewModel =
     val keyboard = LocalSoftwareKeyboardController.current
     val verifyOtpState = vm.verifyOtpUiState.value
     val context = LocalContext.current
+
     verifyOtpState.let { state ->
         if (state.isLoading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -73,7 +79,7 @@ fun OTPVerificationScreen(navController: NavController, vm: VerifyOtpViewModel =
                 Toast.LENGTH_SHORT
             ).show()
             state.message = null
-            navController.navigate(Route.NEW_PASSWORD_SCREEN)
+            navController.navigate(Route.NEW_PASSWORD_SCREEN + "/$token")
         }
 
         Box(
@@ -118,6 +124,7 @@ fun OTPVerificationScreen(navController: NavController, vm: VerifyOtpViewModel =
                     value = editValue,
                     onValueChange = {
                         if (it.length <= otpLength) {
+                            Log.d("harsh", "OTPVerificationScreen: $it")
                             setEditValue(it)
                             vm.onEvent(VerifyOtpUIEvent.OtpChange(it))
                         }
@@ -136,7 +143,7 @@ fun OTPVerificationScreen(navController: NavController, vm: VerifyOtpViewModel =
                     (0 until otpLength).map { index ->
                         OtpCell(
                             modifier = Modifier
-                                .size(60.dp)
+                                .size(50.dp)
                                 .clickable {
                                     focusRequester.requestFocus()
                                     keyboard?.show()
@@ -155,13 +162,14 @@ fun OTPVerificationScreen(navController: NavController, vm: VerifyOtpViewModel =
                             value = editValue.getOrNull(index)?.toString() ?: "",
                             isCursorVisible = editValue.length == index
                         )
-                        Spacer(modifier = Modifier.size(15.dp))
+                        Spacer(modifier = Modifier.size(10.dp))
                     }
                 }
 
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
                 AppButton(
                     onClick = {
+                        vm.token.value = token
                         vm.onEvent(
                             VerifyOtpUIEvent.Submit
                         )

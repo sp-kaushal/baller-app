@@ -137,7 +137,6 @@ fun SignUpScreen(navController: NavController, vm: SignupViewModel = hiltViewMod
                     trailingIcon = {
                         IconButton(onClick = {
                             vm.onEvent(SignUpUIEvent.PasswordToggleChange(!vm.passwordVisibility.value))
-
                         }) {
                             Icon(
                                 imageVector = if (vm.passwordVisibility.value)
