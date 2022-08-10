@@ -13,7 +13,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,84 +30,84 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
+import com.delivery_app.core.util.UiEvent
 import com.example.deliveryprojectstructuredemo.R
-import com.example.deliveryprojectstructuredemo.common.Route
+import com.example.deliveryprojectstructuredemo.data.response.SignUpResponse
 import com.example.deliveryprojectstructuredemo.ui.features.components.AppButton
 import com.example.deliveryprojectstructuredemo.ui.features.components.AppOutlineTextField
 import com.example.deliveryprojectstructuredemo.ui.features.components.AppText
 import com.example.deliveryprojectstructuredemo.ui.features.components.SocialSection
-import com.example.deliveryprojectstructuredemo.ui.features.login.LoginUIEvent
 import com.example.deliveryprojectstructuredemo.ui.theme.DeliveryProjectStructureDemoTheme
 import com.example.deliveryprojectstructuredemo.ui.theme.spacing
 
 @Composable
-fun SignUpScreen(navController: NavController, vm: SignupViewModel = hiltViewModel()) {
+fun SignUpScreen(
+    vm: SignupViewModel = hiltViewModel(),
+    onSuccessfulSignUp: (SignUpResponse) -> Unit,
+    onGoogleClick: () -> Unit,
+    onFacebookClick: () -> Unit,
+    onLoginClick: () -> Unit,
+) {
     val uriHandler = LocalUriHandler.current
     val signUpState = vm.signUpUIState.value
     val context = LocalContext.current
 
-
-    signUpState.let { state ->
-        if (state.isLoading) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+    LaunchedEffect(key1 = true) {
+        vm.uiEvent.collect { uiEvent ->
+            when (uiEvent) {
+                is UiEvent.Success -> {
+                    vm.signupResponse?.let {
+                        onSuccessfulSignUp(it)
+                    }
+                }
+                is UiEvent.ShowToast -> {
+                    Toast.makeText(context, uiEvent.message.asString(context), Toast.LENGTH_LONG)
+                        .show()
+                }
+                else -> Unit
             }
         }
-        state.errorMessage?.let {
-            Toast.makeText(context, "$it", Toast.LENGTH_SHORT).show()
-            state.errorMessage = null
-        }
+    }
 
-        state.user?.let {
-            Toast.makeText(
-                context,
-                "Welcome ${it.firstName} ${it.lastName}",
-                Toast.LENGTH_SHORT
-            ).show()
-            state.user = null
-        }
-
-
-        Box(
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp)
+    ) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
+            Image(
+                painter = painterResource(id = R.drawable.ic_sign_up),
+                contentDescription = "Sign up Icon",
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_sign_up),
-                    contentDescription = "Sign up Icon",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-                AppText(
-                    text = stringResource(id = R.string.sign_up),
-                    style = MaterialTheme.typography.h1,
-                    color = MaterialTheme.colors.onSurface,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-                AppText(
-                    text = stringResource(id = R.string.create_free_account_and_join_us),
-                    style = MaterialTheme.typography.h2,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-                AppOutlineTextField(
-                    value = vm.name.value,
-                    label = { Text(text = stringResource(id = R.string.your_name)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    onValueChange = {
+                    .fillMaxWidth()
+                    .height(150.dp)
+            )
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+            AppText(
+                text = stringResource(id = R.string.sign_up),
+                style = MaterialTheme.typography.h1,
+                color = MaterialTheme.colors.onSurface,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+            AppText(
+                text = stringResource(id = R.string.create_free_account_and_join_us),
+                style = MaterialTheme.typography.h2,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+            AppOutlineTextField(
+                value = vm.name.value,
+                label = { Text(text = stringResource(id = R.string.your_name)) },
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = {
                         vm.onEvent(SignUpUIEvent.NameChange(it))
                     },
                     placeholder = { Text(text = stringResource(id = R.string.enter_your_name)) },
@@ -206,27 +207,28 @@ fun SignUpScreen(navController: NavController, vm: SignupViewModel = hiltViewMod
 
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
-                AppButton(
-                    onClick = {
-                              vm.onEvent(SignUpUIEvent.Submit)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Text(text = stringResource(id = R.string.create_account))
-                }
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-                SocialSection(
-                    onGoogleClick = { /*TODO*/ },
-                    onFacebookClick = { /*TODO*/ },
-                    onFooterClick = { navController.navigate(Route.LOGIN_SCREEN) })
-
+            AppButton(
+                onClick = {
+                    vm.onEvent(SignUpUIEvent.Submit)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(text = stringResource(id = R.string.create_account))
             }
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+            SocialSection(
+                onGoogleClick = { onGoogleClick },
+                onFacebookClick = { onFacebookClick },
+                onFooterClick = { onLoginClick })
 
+        }
+        if (signUpState.isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
         }
     }
 
-}
 @Preview("default", "rectangle")
 @Preview("dark theme", "rectangle", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview("large font", "rectangle", fontScale = 2f)

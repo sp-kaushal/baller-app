@@ -4,9 +4,7 @@ import com.example.deliveryprojectstructuredemo.data.UserInfo
 
 
 data class LoginUIState(
-    var isDataLoading: Boolean = false,
-    var errorMessage: String? = null,
-    var user: UserInfo? = null,
-    val userNameValid: Boolean = true,
-    val userNameValidError:String? = null
+    val isDataLoading: Boolean = false,
+    val errorMessage: String? = null,
+    val user: UserInfo? = null,
     )

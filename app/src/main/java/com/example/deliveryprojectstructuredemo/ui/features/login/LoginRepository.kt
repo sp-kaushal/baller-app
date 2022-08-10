@@ -50,17 +50,14 @@ class RepositoryImpl @Inject constructor(
         )
         when(val response= getAnswerSuccess(service.userLogin(requestBody))){
             is RepositoryResult.Success -> {
-//                setUserData(userName)
                 response.data?.userInfo?.let { userInfo ->
                     UserStorage.token = userInfo.token
-//                    cryptoUtil.setSeed(userInfo.otpSeed)
                     val dataObject = JsonObject()
                     dataObject.addProperty(ApiConstants.first_name, userInfo.firstName)
                     dataObject.addProperty(ApiConstants.last_name, userInfo.lastName)
                     dataObject.addProperty(ApiConstants.mobile, userInfo.mobile)
                     dataObject.addProperty(ApiConstants.email, userInfo.email)
                     dataObject.addProperty(ApiConstants.token, userInfo.token)
-//                    dataObject.addProperty(Constants.PASSWORD, password)
                     dataStoreManager.setUserInfo(dataObject.toString())
                     return RepositoryResult.Success(response.data)
                 } ?: run {

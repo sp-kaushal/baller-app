@@ -1,5 +1,6 @@
 package com.example.deliveryprojectstructuredemo.di.modules
 
+import androidx.datastore.preferences.preferencesDataStore
 import com.example.deliveryprojectstructuredemo.data.datastore.DataStoreManager
 import com.example.deliveryprojectstructuredemo.network.APIService
 import com.example.deliveryprojectstructuredemo.ui.features.login.LoginRepository
@@ -27,7 +28,10 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideSignUpRepo(apiService: APIService): SignUpRepository {
-        return SignUpRepoImpl(apiService)
+    fun provideSignUpRepo(
+        apiService: APIService,
+        dataStoreManager: DataStoreManager,
+    ): SignUpRepository {
+        return SignUpRepoImpl(service = apiService, dataStoreManager = dataStoreManager)
     }
 }

@@ -16,5 +16,5 @@ interface APIService {
     suspend fun userLogin(@Body loginRequest: LoginRequest):ApiResult<LoginResponse,NetworkError>
 
     @POST(ApiConstants.SIGNUP)
-    suspend fun userSignUp(@Body signUpRequest: SignUpRequest): SignUpResponse
+    suspend fun userSignUp(@Body signUpRequest: SignUpRequest):ApiResult<SignUpResponse,NetworkError>
 }

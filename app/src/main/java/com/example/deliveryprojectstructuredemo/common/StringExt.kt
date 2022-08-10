@@ -15,9 +15,9 @@ fun String.isValidEmail(): Boolean {
 }
 
 fun String.isValidPassword(): Boolean {
-    val regex = ("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$")
+    val regex = ("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{6,}$")
     val p = regex.toRegex()
-    return p.matches(this) && this.length >= 8
+    return p.matches(this) && this.length >= 6
 }
 
 fun String.passwordMatches(repeated: String): Boolean {
