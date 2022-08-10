@@ -1,5 +1,8 @@
 package com.example.deliveryprojectstructuredemo.ui.features.login
 
+import android.app.Application
+import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -9,6 +12,11 @@ import com.delivery_app.core.util.UiEvent
 import com.delivery_app.core.util.UiText
 import com.example.deliveryprojectstructuredemo.common.ResultWrapper
 import com.example.deliveryprojectstructuredemo.data.UserInfo
+import androidx.lifecycle.*
+import com.example.deliveryprojectstructuredemo.common.ResultWrapper.*
+import com.example.deliveryprojectstructuredemo.common.isValidEmail
+import com.example.deliveryprojectstructuredemo.common.isValidPassword
+import com.example.deliveryprojectstructuredemo.data.GoogleUserModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -22,6 +30,32 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
+
+class LoginViewModel @Inject constructor(private var loginRepository: LoginRepository,application: Application) :
+    AndroidViewModel(application) {
+    private var _userState=MutableLiveData<GoogleUserModel>()
+    val googleUser:LiveData<GoogleUserModel> =_userState
+
+    private var _loadingState=MutableLiveData(false)
+    val loading:LiveData<Boolean> =_loadingState
+
+    fun fetchSignInUser(email:String?,name: String?,idToken:String?){
+        _loadingState.value=true
+        viewModelScope.launch {
+            _userState.value= GoogleUserModel(
+                email=email,
+                name = name,
+                idToken =idToken,
+            )
+        }
+        _loadingState.value=false
+    }
+    fun hideLoading(){
+        _loadingState.value=false
+    }
+    fun showLoading(){
+        _loadingState.value=true
+    }
 
     private val _loginUiState = mutableStateOf(LoginUIState())
     val loginUiState: State<LoginUIState> = _loginUiState
@@ -67,8 +101,8 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
                             )
                         }
                 }
-            }
-                is ResultWrapper.GenericError -> {
+                is GenericError -> {
+                    _loginUiState.value = loginUiState.value.copy(isLoading = false)
                     _loginUiState.value =
                         LoginUIState(
                             user=null,

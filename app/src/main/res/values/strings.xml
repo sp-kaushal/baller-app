@@ -1,4 +1,5 @@
 <resources>
+    <string name="google_cloud_server_client_id">310180945597-04jvckq48ar3cjbti38aadjorgu4o9hk.apps.googleusercontent.com</string>
     <string name="app_name">DeliveryProjectStructureDemo</string>
     <string name="dialog_button_confirm">Confirm</string>
     <string name="dialog_button_cancel">Cancel</string>
