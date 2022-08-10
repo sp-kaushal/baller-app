@@ -6,6 +6,7 @@ object AppConstants {
     const val ANDROID="android"
     const val KEY_PASSWORD = "password"
     const val KEY_USERS = "users"
+    const val DEFAULT_ERROR_MESSAGE = "Something went wrong"
 }
 
 object Route {

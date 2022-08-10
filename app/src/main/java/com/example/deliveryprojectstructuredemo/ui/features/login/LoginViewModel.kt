@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.delivery_app.core.model.RepositoryResult
 import com.delivery_app.core.util.UiEvent
 import com.delivery_app.core.util.UiText
+import com.example.deliveryprojectstructuredemo.common.ResultWrapper
 import com.example.deliveryprojectstructuredemo.data.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -46,35 +47,44 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
                     password = password
                 )
             when (loginResponse) {
-                is RepositoryResult.Success -> {
-                    loginResponse.data?.let { loginResponse ->
+                is ResultWrapper.Success -> {
+                    loginResponse.value.let { response ->
 
-                        if (loginResponse.status == 200) {
+                        if (response.status == 200) {
                             _loginUiState.value =
                                 LoginUIState(
-                                    user = loginResponse.userInfo,
+                                    user = response.userInfo,
                                     isDataLoading = false,
                                     errorMessage = null
                                 )
-                            userInfo=loginResponse.userInfo
+                            userInfo=response.userInfo
                             _uiEvent.send(UiEvent.Success)
                         } else {
                             _loginUiState.value = LoginUIState(
                                 user=null,
-                                errorMessage = loginResponse.message ?: "Something went wrong",
+                                errorMessage = response.message ?: "Something went wrong",
                                 isDataLoading = false
                             )
                         }
                 }
             }
-                is RepositoryResult.Error -> {
+                is ResultWrapper.GenericError -> {
                     _loginUiState.value =
                         LoginUIState(
                             user=null,
-                            errorMessage = loginResponse.exception,
+                            errorMessage = "${loginResponse.code} ${loginResponse.message}",
                             isDataLoading = false
                         )
-                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString(loginResponse.exception)))
+                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString("${loginResponse.code} ${loginResponse.message}")))
+                }
+                is ResultWrapper.NetworkError -> {
+                    _loginUiState.value =
+                        LoginUIState(
+                            user=null,
+                            errorMessage = "${loginResponse.message}",
+                            isDataLoading = false
+                        )
+                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString(loginResponse.message)))
                 }
 
 

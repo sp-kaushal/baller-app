@@ -7,9 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.delivery_app.core.model.RepositoryResult
 import com.delivery_app.core.util.UiEvent
 import com.delivery_app.core.util.UiText
-import com.example.deliveryprojectstructuredemo.common.isValidEmail
-import com.example.deliveryprojectstructuredemo.common.isValidFullName
-import com.example.deliveryprojectstructuredemo.common.isValidPassword
+import com.example.deliveryprojectstructuredemo.R
+import com.example.deliveryprojectstructuredemo.common.*
 import com.example.deliveryprojectstructuredemo.data.response.SignUpResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -69,15 +68,16 @@ class SignupViewModel @Inject constructor(private var signUpRepository: SignUpRe
 
                 viewModelScope.launch {
                     if (!name.value.isValidFullName()) {
-                        _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString("Please enter valid full name")))
+                        _uiEvent.send(UiEvent.ShowToast(UiText.StringResource(R.string.enter_valid_full_name)))
 
                     } else if (!email.value.isValidEmail()) {
-                        _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString("Please enter valid email")))
+                        _uiEvent.send(UiEvent.ShowToast(UiText.StringResource(R.string.enter_valid_email)))
 
                     } else if (!password.value.isValidPassword()) {
-                        _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString("Password must have at least eight characters with a lowercase letter, an uppercase letter and a number")))
+                        _uiEvent.send(UiEvent.ShowToast(UiText.StringResource(R.string.password_error)))
 
                     } else if (!termsAccepted.value) {
+                        _uiEvent.send(UiEvent.ShowToast(UiText.StringResource(R.string.please_accept_tems)))
 
                     } else {
                         signUp()
@@ -99,18 +99,27 @@ class SignupViewModel @Inject constructor(private var signUpRepository: SignUpRe
                     password = password.value
                 )
             when (signUpResponse) {
-                is RepositoryResult.Error -> {
+                is ResultWrapper.NetworkError -> {
                     _signUpUiState.value =
                         SignUpUIState(
                             user = null,
-                            errorMessage = signUpResponse.exception,
+                            errorMessage = signUpResponse.message,
                             isLoading = false
                         )
-                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString(signUpResponse.exception)))
+                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString(signUpResponse.message)))
                 }
-                is RepositoryResult.Success -> {
+                is ResultWrapper.GenericError -> {
+                    _signUpUiState.value =
+                        SignUpUIState(
+                            user = null,
+                            errorMessage = "${signUpResponse.code} ${signUpResponse.message}",
+                            isLoading = false
+                        )
+                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString("${signUpResponse.code} ${signUpResponse.message}")))
+                }
+                is ResultWrapper.Success -> {
 
-                    signUpResponse.data?.let { response ->
+                    signUpResponse.value.let { response ->
                         if (response.status == 200) {
                             _signUpUiState.value =
                                 SignUpUIState(user = response.userInfo)
@@ -122,7 +131,7 @@ class SignupViewModel @Inject constructor(private var signUpRepository: SignUpRe
                             _uiEvent.send(
                                 UiEvent.ShowToast(
                                     UiText.DynamicString(
-                                        signUpResponse.data?.message ?: "Something went wromg"
+                                        response.message ?: AppConstants.DEFAULT_ERROR_MESSAGE
                                     )
                                 )
                             )

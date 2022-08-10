@@ -13,8 +13,8 @@ import retrofit2.http.POST
 interface APIService {
 
     @POST(ApiConstants.LOGIN)
-    suspend fun userLogin(@Body loginRequest: LoginRequest):ApiResult<LoginResponse,NetworkError>
+    suspend fun userLogin(@Body loginRequest: LoginRequest):LoginResponse
 
     @POST(ApiConstants.SIGNUP)
-    suspend fun userSignUp(@Body signUpRequest: SignUpRequest):ApiResult<SignUpResponse,NetworkError>
+    suspend fun userSignUp(@Body signUpRequest: SignUpRequest):SignUpResponse
 }
