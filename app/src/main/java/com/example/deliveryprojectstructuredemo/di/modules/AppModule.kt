@@ -4,8 +4,12 @@ import android.content.Context
 import com.example.deliveryprojectstructuredemo.BuildConfig
 import com.example.deliveryprojectstructuredemo.common.ApiConstants
 import com.example.deliveryprojectstructuredemo.network.APIService
+import com.example.deliveryprojectstructuredemo.ui.features.forgot_password.ForgotPasswordRepoImpl
+import com.example.deliveryprojectstructuredemo.ui.features.forgot_password.ForgotPasswordRepository
 import com.example.deliveryprojectstructuredemo.ui.features.login.LoginRepository
 import com.example.deliveryprojectstructuredemo.ui.features.login.RepositoryImpl
+import com.example.deliveryprojectstructuredemo.ui.features.otp_verification.VerifyOtpRepoImpl
+import com.example.deliveryprojectstructuredemo.ui.features.otp_verification.VerifyOtpRepository
 import com.example.deliveryprojectstructuredemo.ui.features.sign_up.SignUpRepoImpl
 import com.example.deliveryprojectstructuredemo.ui.features.sign_up.SignUpRepository
 import com.google.gson.FieldNamingPolicy
@@ -71,19 +75,29 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideApiClient(retrofit: Retrofit): APIService {
-        return retrofit.create(APIService::class.java)
-    }
+    fun provideApiClient(retrofit: Retrofit): APIService =
+        retrofit.create(APIService::class.java)
+
 
     @Provides
     @Singleton
-    fun provideLoginRepo(apiService: APIService): LoginRepository {
-        return RepositoryImpl(apiService)
-    }
+    fun provideLoginRepo(apiService: APIService): LoginRepository =
+        RepositoryImpl(apiService)
+
 
     @Provides
     @Singleton
-    fun provideSignUpRepo(apiService: APIService): SignUpRepository {
-        return SignUpRepoImpl(apiService)
-    }
+    fun provideSignUpRepo(apiService: APIService): SignUpRepository =
+        SignUpRepoImpl(apiService)
+
+    @Provides
+    @Singleton
+    fun provideForgotPassRepo(apiService: APIService): ForgotPasswordRepository =
+        ForgotPasswordRepoImpl(apiService)
+
+    @Provides
+    @Singleton
+    fun provideVerifyOtp(apiService: APIService): VerifyOtpRepository =
+        VerifyOtpRepoImpl(apiService)
+
 }

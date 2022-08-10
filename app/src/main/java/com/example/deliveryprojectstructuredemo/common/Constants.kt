@@ -1,7 +1,7 @@
 package com.example.deliveryprojectstructuredemo.common
 
 object AppConstants {
-    const val ANDROID="android"
+    const val ANDROID = "android"
     const val KEY_PASSWORD = "password"
     const val KEY_USERS = "users"
 }
@@ -16,7 +16,9 @@ object Route {
 }
 
 object ApiConstants {
-    const val BASE_URL="http://delivery-app.softprodigyphp.in"
-    const val LOGIN="/login"
-    const val SIGNUP="/register"
+    const val BASE_URL = "http://delivery-app.softprodigyphp.in"
+    const val LOGIN = "/login"
+    const val SIGNUP = "/register"
+    const val FORGOT_PASSWORD = "/forgot/password"
+    const val VERIFY_OTP = "/verifyOtp/"
 }
