@@ -1,7 +1,7 @@
 package com.softprodigy.deliveryapp.common
 
 object AppConstants {
-    const val ANDROID="android"
+    const val ANDROID = "android"
     const val KEY_PASSWORD = "password"
     const val KEY_USERS = "users"
     const val DEFAULT_ERROR_MESSAGE = "Something went wrong"
@@ -17,11 +17,15 @@ object Route {
 }
 
 object ApiConstants {
+    const val BASE_URL = "http://delivery-app.softprodigyphp.in"
+    const val LOGIN = "/login"
+    const val SIGNUP = "/register"
+    const val FORGOT_PASSWORD = "/forgot/password"
+    const val VERIFY_OTP = "/verifyOtp/"
+    const val RESET_PASS = "/reset/password/"
     const val first_name="first_name"
     const val last_name="lastName"
     const val mobile="mobile"
     const val email="email"
     const val token="token"
-    const val LOGIN="/login"
-    const val SIGNUP="/register"
 }

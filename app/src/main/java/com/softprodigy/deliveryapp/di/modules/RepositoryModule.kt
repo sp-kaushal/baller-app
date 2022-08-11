@@ -1,5 +1,12 @@
 package com.softprodigy.deliveryapp.di.modules
 
+
+import com.softprodigy.deliveryapp.ui.features.create_new_password.ResetPasswordRepoImpl
+import com.softprodigy.deliveryapp.ui.features.create_new_password.ResetPasswordRepository
+import com.softprodigy.deliveryapp.ui.features.forgot_password.ForgotPasswordRepoImpl
+import com.softprodigy.deliveryapp.ui.features.forgot_password.ForgotPasswordRepository
+import com.softprodigy.deliveryapp.ui.features.otp_verification.VerifyOtpRepoImpl
+import com.softprodigy.deliveryapp.ui.features.otp_verification.VerifyOtpRepository
 import com.softprodigy.deliveryapp.data.datastore.DataStoreManager
 import com.softprodigy.deliveryapp.network.APIService
 import com.softprodigy.deliveryapp.ui.features.login.LoginRepository
@@ -33,4 +40,20 @@ object RepositoryModule {
     ): SignUpRepository {
         return SignUpRepoImpl(service = apiService, dataStoreManager = dataStoreManager)
     }
+
+    @Provides
+    @Singleton
+    fun provideForgotPassRepo(apiService: APIService): ForgotPasswordRepository =
+        ForgotPasswordRepoImpl(apiService)
+
+    @Provides
+    @Singleton
+    fun provideVerifyOtp(apiService: APIService): VerifyOtpRepository =
+        VerifyOtpRepoImpl(apiService)
+
+    @Provides
+    @Singleton
+    fun provideResetPassword(apiService: APIService): ResetPasswordRepository =
+        ResetPasswordRepoImpl(apiService)
+
 }
