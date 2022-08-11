@@ -7,5 +7,5 @@ data class UserInfo(
     @SerializedName("last_name") var lastName: String? = null,
     @SerializedName("mobile") var mobile: String? = null,
     @SerializedName("email") var email: String = "",
-    @SerializedName("token") var token: String? = null
+    @SerializedName("token") var token: String = ""
 )

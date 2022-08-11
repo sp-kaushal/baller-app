@@ -2,6 +2,7 @@ package com.example.deliveryprojectstructuredemo.di.modules
 
 import android.content.Context
 import com.example.deliveryprojectstructuredemo.BuildConfig
+import com.example.deliveryprojectstructuredemo.DeliveryApp
 import com.example.deliveryprojectstructuredemo.common.ApiConstants
 import com.example.deliveryprojectstructuredemo.network.APIService
 import com.example.deliveryprojectstructuredemo.ui.features.create_new_password.ResetPasswordRepoImpl
@@ -30,35 +31,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
-    /**
-     * Application's Base URL
-     */
-    @Provides
-    fun providesAppBaseURL() = ApiConstants.BASE_URL
 
-
-    /**
-     * Logger For API
-     */
-    @Provides
     @Singleton
-    fun provideOkHttpClient(@ApplicationContext context: Context/*, sessionDataManager: SessionDataManager*/): OkHttpClient {
-        val loggingInterceptor = HttpLoggingInterceptor()
-        loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
-        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-        val okHttpClient = OkHttpClient.Builder()
-//        okHttpClient.addInterceptor(AuthInterceptor(sessionDataManager))
-//        okHttpClient.addInterceptor(LoggingInterceptor(context))
-        if (BuildConfig.DEBUG) {
-            okHttpClient.addInterceptor(loggingInterceptor)
-        }
-        return okHttpClient.build()
-    }
-
-
-    /**
-     * Init Retrofit Client for Network
-     */
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient, BASE_URL: String): Retrofit =
@@ -107,4 +81,7 @@ class AppModule {
     fun provideResetPassword(apiService: APIService): ResetPasswordRepository =
         ResetPasswordRepoImpl(apiService)
 
+    fun provideApplication(@ApplicationContext app: Context): DeliveryApp {
+        return app as DeliveryApp
+    }
 }

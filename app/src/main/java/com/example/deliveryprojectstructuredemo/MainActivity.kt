@@ -1,6 +1,7 @@
 package com.example.deliveryprojectstructuredemo
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,11 +9,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.deliveryprojectstructuredemo.common.Route
 import com.example.deliveryprojectstructuredemo.common.Route.FORGOT_PASSWORD_SCREEN
 import com.example.deliveryprojectstructuredemo.common.Route.LOGIN_SCREEN
 import com.example.deliveryprojectstructuredemo.common.Route.NEW_PASSWORD_SCREEN
@@ -27,6 +28,7 @@ import com.example.deliveryprojectstructuredemo.ui.features.sign_up.SignUpScreen
 import com.example.deliveryprojectstructuredemo.ui.features.welcome.WelcomeScreen
 import com.example.deliveryprojectstructuredemo.ui.theme.DeliveryProjectStructureDemoTheme
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -57,10 +59,30 @@ fun NavControllerComposable() {
             WelcomeScreen(navController = navController)
         }
         composable(route = LOGIN_SCREEN) {
-            LoginScreen(navController = navController)
+            val context = LocalContext.current
+
+            LoginScreen(
+                onLoginSuccess = { user ->
+                    Timber.i("Welcome ${user.firstName} ${user.lastName}")
+                    Toast.makeText(
+                        context,
+                        "Welcome ${user.firstName} ${user.lastName}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                },
+                onCreateAccountClick = { navController.navigate(SIGN_UP_SCREEN) },
+                onForgetPasswordClick = {},
+                onGoogleClick = {},
+                onFacebookClick = {})
         }
         composable(route = SIGN_UP_SCREEN) {
-            SignUpScreen(navController = navController)
+            val context = LocalContext.current
+            SignUpScreen(onSuccessfulSignUp = {signUpResponse ->
+                Toast.makeText(context, "verifyToken ${signUpResponse.verifyToken}", Toast.LENGTH_SHORT).show()
+            },
+            onGoogleClick = {},
+            onFacebookClick = {},
+            onLoginClick = {})
         }
         composable(route = FORGOT_PASSWORD_SCREEN) {
             ForgotPasswordScreen(navController = navController)

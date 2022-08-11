@@ -4,19 +4,29 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.deliveryprojectstructuredemo.common.ResultWrapper.*
-import com.example.deliveryprojectstructuredemo.common.isValidEmail
-import com.example.deliveryprojectstructuredemo.common.isValidFullName
-import com.example.deliveryprojectstructuredemo.common.isValidPassword
+import com.delivery_app.core.model.RepositoryResult
+import com.delivery_app.core.util.UiEvent
+import com.delivery_app.core.util.UiText
+import com.example.deliveryprojectstructuredemo.R
+import com.example.deliveryprojectstructuredemo.common.*
+import com.example.deliveryprojectstructuredemo.data.response.SignUpResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SignupViewModel @Inject constructor(private var signUpRepository: SignUpRepository) :
     ViewModel() {
+    private val _uiEvent = Channel<UiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
+
     private val _signUpUiState = mutableStateOf(SignUpUIState())
     val signUpUIState: State<SignUpUIState> = _signUpUiState
+
+    var signupResponse: SignUpResponse? = null
+        private set
 
     private val _name = mutableStateOf("")
     val name: State<String> = _name
@@ -56,20 +66,22 @@ class SignupViewModel @Inject constructor(private var signUpRepository: SignUpRe
             }
             is SignUpUIEvent.Submit -> {
 
-                if (!name.value.isValidFullName()) {
-                    _signUpUiState.value =
-                        signUpUIState.value.copy(errorMessage = "Please enter valid full name")
-                } else if (!email.value.isValidEmail()) {
-                    _signUpUiState.value =
-                        signUpUIState.value.copy(errorMessage = "Please enter valid email")
-                } else if (!password.value.isValidPassword()) {
-                    _signUpUiState.value =
-                        signUpUIState.value.copy(errorMessage = "Password must have at least eight characters with a lowercase letter, an uppercase letter and a number")
-                } else if (!termsAccepted.value) {
-                    _signUpUiState.value =
-                        signUpUIState.value.copy(errorMessage = "Please accept our terms of service and Privacy Policy ")
-                } else {
-                    signUp()
+                viewModelScope.launch {
+                    if (!name.value.isValidFullName()) {
+                        _uiEvent.send(UiEvent.ShowToast(UiText.StringResource(R.string.enter_valid_full_name)))
+
+                    } else if (!email.value.isValidEmail()) {
+                        _uiEvent.send(UiEvent.ShowToast(UiText.StringResource(R.string.enter_valid_email)))
+
+                    } else if (!password.value.isValidPassword()) {
+                        _uiEvent.send(UiEvent.ShowToast(UiText.StringResource(R.string.password_error)))
+
+                    } else if (!termsAccepted.value) {
+                        _uiEvent.send(UiEvent.ShowToast(UiText.StringResource(R.string.please_accept_tems)))
+
+                    } else {
+                        signUp()
+                    }
                 }
             }
         }
@@ -77,7 +89,7 @@ class SignupViewModel @Inject constructor(private var signUpRepository: SignUpRe
 
     private fun signUp() {
         viewModelScope.launch {
-            _signUpUiState.value = signUpUIState.value.copy(isLoading = true)
+            _signUpUiState.value = SignUpUIState(isLoading = true)
 
             val signUpResponse =
                 signUpRepository.signUpWithDetails(
@@ -87,28 +99,44 @@ class SignupViewModel @Inject constructor(private var signUpRepository: SignUpRe
                     password = password.value
                 )
             when (signUpResponse) {
-                is NetworkError -> {
-                    _signUpUiState.value = signUpUIState.value.copy(isLoading = false)
+                is ResultWrapper.NetworkError -> {
                     _signUpUiState.value =
-                        signUpUIState.value.copy(errorMessage = signUpResponse.toString())
-                }
-                is GenericError -> {
-                    _signUpUiState.value = signUpUIState.value.copy(isLoading = false)
-                    _signUpUiState.value =
-                        signUpUIState.value.copy(errorMessage = "${signUpResponse.code} ${signUpResponse.message}")
-
-                }
-                is Success -> {
-                    _signUpUiState.value = signUpUIState.value.copy(isLoading = false)
-                    if (signUpResponse.value.status == 200) {
-                        _signUpUiState.value =
-                            signUpUIState.value.copy(user = signUpResponse.value.userInfo)
-
-                    } else {
-                        _signUpUiState.value = signUpUIState.value.copy(
-                            errorMessage = signUpResponse.value.message ?: "Something went wrong"
+                        SignUpUIState(
+                            user = null,
+                            errorMessage = signUpResponse.message,
+                            isLoading = false
                         )
+                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString(signUpResponse.message)))
+                }
+                is ResultWrapper.GenericError -> {
+                    _signUpUiState.value =
+                        SignUpUIState(
+                            user = null,
+                            errorMessage = "${signUpResponse.code} ${signUpResponse.message}",
+                            isLoading = false
+                        )
+                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString("${signUpResponse.code} ${signUpResponse.message}")))
+                }
+                is ResultWrapper.Success -> {
 
+                    signUpResponse.value.let { response ->
+                        if (response.status == 200) {
+                            _signUpUiState.value =
+                                SignUpUIState(user = response.userInfo)
+
+                            signupResponse = response
+
+                            _uiEvent.send(UiEvent.Success)
+                        } else {
+                            _uiEvent.send(
+                                UiEvent.ShowToast(
+                                    UiText.DynamicString(
+                                        response.message ?: AppConstants.DEFAULT_ERROR_MESSAGE
+                                    )
+                                )
+                            )
+
+                        }
                     }
                 }
             }

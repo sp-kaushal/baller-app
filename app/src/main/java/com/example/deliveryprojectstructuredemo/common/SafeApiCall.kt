@@ -1,9 +1,7 @@
 package com.example.deliveryprojectstructuredemo.common
 
-import android.util.Log
 import com.example.deliveryprojectstructuredemo.data.ErrorResponse
 import com.google.gson.Gson
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -18,20 +16,18 @@ suspend fun <T> safeApiCall(
             ResultWrapper.Success(apiCall.invoke())
         } catch (throwable: Throwable) {
             when (throwable) {
-                is IOException -> ResultWrapper.NetworkError
+                is IOException ->{
+                    val message = throwable.message
+                    ResultWrapper.NetworkError(message = message?:AppConstants.DEFAULT_ERROR_MESSAGE)
+                }
                 is HttpException -> {
-                /*    val code = throwable.code()
-                    val errorResponse = convertErrorBody(throwable)
-                    ResultWrapper.GenericError(code, errorResponse)*/
                     val code = throwable.code()
                     val errorBody = throwable.response()?.errorBody()?.string()
-//                    Timber.d(code.toString())
-//                    Timber.d(errorBody)
                     val gsonErrorBody = Gson().fromJson(
                         errorBody,
                         ErrorResponse::class.java
                     )
-                    val message = gsonErrorBody.error.toString()
+                    val message = gsonErrorBody.Error
                     ResultWrapper.GenericError(code, message)
                 }
                 else -> {
@@ -40,17 +36,5 @@ suspend fun <T> safeApiCall(
             }
 
         }
-    }
-}
-
-private fun convertErrorBody(throwable: HttpException): ErrorResponse? {
-    return try {
-        throwable.response()?.errorBody()?.source()?.let {
-            val moshiAdapter = Moshi.Builder().build().adapter(ErrorResponse::class.java)
-            moshiAdapter.fromJson(it)
-        }
-    } catch (exception: Exception) {
-        exception.printStackTrace()
-        null
     }
 }

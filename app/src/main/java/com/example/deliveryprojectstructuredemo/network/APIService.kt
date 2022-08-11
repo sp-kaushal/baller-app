@@ -11,6 +11,8 @@ import com.example.deliveryprojectstructuredemo.data.response.LoginResponse
 import com.example.deliveryprojectstructuredemo.data.response.ResetPasswordResponse
 import com.example.deliveryprojectstructuredemo.data.response.SignUpResponse
 import com.example.deliveryprojectstructuredemo.data.response.VerifyOtpResponse
+import com.delivery_app.core.model.NetworkError
+import com.slack.eithernet.ApiResult
 import retrofit2.http.Body
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -20,7 +22,7 @@ import retrofit2.http.Query
 interface APIService {
 
     @POST(ApiConstants.LOGIN)
-    suspend fun userLogin(@Body loginRequest: LoginRequest): LoginResponse
+    suspend fun userLogin(@Body loginRequest: LoginRequest):LoginResponse
 
     @POST(ApiConstants.SIGNUP)
     suspend fun userSignUp(@Body signUpRequest: SignUpRequest): SignUpResponse
@@ -39,4 +41,5 @@ interface APIService {
         @Path("token") token: String,
         @Body resetPasswordRequest: ResetPasswordRequest
     ): ResetPasswordResponse
+    suspend fun userSignUp(@Body signUpRequest: SignUpRequest):SignUpResponse
 }
