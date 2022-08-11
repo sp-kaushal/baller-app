@@ -32,54 +32,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class AppModule {
 
-    @Singleton
-    @Provides
-    @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient, BASE_URL: String): Retrofit =
-        Retrofit.Builder()
-            .addConverterFactory(
-                GsonConverterFactory.create(
-                    GsonBuilder().setLenient()
-                        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                        .create()
-                )
-            )
-//            .addCallAdapterFactory(CoroutineCallAdapterFactory())
-            .baseUrl(BASE_URL)
-            .client(okHttpClient)
-            .build()
-
-    @Provides
-    @Singleton
-    fun provideApiClient(retrofit: Retrofit): APIService =
-        retrofit.create(APIService::class.java)
-
-
-    @Provides
-    @Singleton
-    fun provideLoginRepo(apiService: APIService): LoginRepository =
-        RepositoryImpl(apiService)
-
-
-    @Provides
-    @Singleton
-    fun provideSignUpRepo(apiService: APIService): SignUpRepository =
-        SignUpRepoImpl(apiService)
-
-    @Provides
-    @Singleton
-    fun provideForgotPassRepo(apiService: APIService): ForgotPasswordRepository =
-        ForgotPasswordRepoImpl(apiService)
-
-    @Provides
-    @Singleton
-    fun provideVerifyOtp(apiService: APIService): VerifyOtpRepository =
-        VerifyOtpRepoImpl(apiService)
-
-    @Provides
-    @Singleton
-    fun provideResetPassword(apiService: APIService): ResetPasswordRepository =
-        ResetPasswordRepoImpl(apiService)
 
     fun provideApplication(@ApplicationContext app: Context): DeliveryApp {
         return app as DeliveryApp

@@ -30,6 +30,4 @@ object ApiConstants {
     const val mobile="mobile"
     const val email="email"
     const val token="token"
-    const val LOGIN="/login"
-    const val SIGNUP="/register"
 }

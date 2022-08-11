@@ -41,5 +41,5 @@ interface APIService {
         @Path("token") token: String,
         @Body resetPasswordRequest: ResetPasswordRequest
     ): ResetPasswordResponse
-    suspend fun userSignUp(@Body signUpRequest: SignUpRequest):SignUpResponse
+
 }
