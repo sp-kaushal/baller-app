@@ -18,7 +18,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(private var loginRepository: LoginRepository,application: Application) :
+class LoginViewModel @Inject constructor(
+    private var loginRepository: LoginRepository,
+    application: Application
+) :
     AndroidViewModel(application) {
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -26,37 +29,38 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
     private val _loginUiState = mutableStateOf(LoginUIState())
     val loginUiState: State<LoginUIState> = _loginUiState
 
-    private var _userState=MutableLiveData<GoogleUserModel>()
-    val googleUser:LiveData<GoogleUserModel> =_userState
+    private var _userState = MutableLiveData<GoogleUserModel>()
+    val googleUser: LiveData<GoogleUserModel> = _userState
 
 /*    private var _loadingState=MutableLiveData(false)
     val loading:LiveData<Boolean> =_loadingState*/
 
-    fun fetchSignInUser(email:String?,name: String?,idToken:String?){
+    fun fetchSignInUser(email: String?, name: String?, idToken: String?) {
 //        _loadingState.value=true
         _loginUiState.value = LoginUIState(isDataLoading = true)
 
         viewModelScope.launch {
-            _userState.value= GoogleUserModel(
-                email=email,
+            _userState.value = GoogleUserModel(
+                email = email,
                 name = name,
-                idToken =idToken,
+                idToken = idToken,
             )
         }
 //        _loadingState.value=false
         _loginUiState.value = LoginUIState(isDataLoading = false)
 
     }
-    fun hideLoading(){
+
+    fun hideLoading() {
 //        _loadingState.value=false
         _loginUiState.value = LoginUIState(isDataLoading = false)
     }
-    fun showLoading(){
+
+    fun showLoading() {
 //        _loadingState.value=true
         _loginUiState.value = LoginUIState(isDataLoading = false)
 
     }
-
 
 
     var userInfo: UserInfo? = null
@@ -65,7 +69,7 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
     fun onEvent(event: LoginUIEvent) {
         when (event) {
             is LoginUIEvent.Submit -> {
-                    login(event.email, event.password)
+                login(event.email, event.password)
             }
         }
     }
@@ -80,7 +84,7 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
                     password = password
                 )
             when (loginResponse) {
-                is ResultWrapper.Success ->{
+                is ResultWrapper.Success -> {
                     loginResponse.value.let { response ->
 
                         if (response.status == 200) {
@@ -90,22 +94,22 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
                                     isDataLoading = false,
                                     errorMessage = null
                                 )
-                            userInfo=response.userInfo
+                            userInfo = response.userInfo
                             _uiEvent.send(UiEvent.Success)
                         } else {
                             _loginUiState.value = LoginUIState(
-                                user=null,
+                                user = null,
                                 errorMessage = response.message ?: "Something went wrong",
                                 isDataLoading = false
                             )
                         }
-                }
+                    }
                 }
                 is GenericError -> {
                     _loginUiState.value = loginUiState.value.copy(isDataLoading = false)
                     _loginUiState.value =
                         LoginUIState(
-                            user=null,
+                            user = null,
                             errorMessage = "${loginResponse.code} ${loginResponse.message}",
                             isDataLoading = false
                         )
@@ -114,18 +118,16 @@ class LoginViewModel @Inject constructor(private var loginRepository: LoginRepos
                 is ResultWrapper.NetworkError -> {
                     _loginUiState.value =
                         LoginUIState(
-                            user=null,
+                            user = null,
                             errorMessage = "${loginResponse.message}",
                             isDataLoading = false
                         )
                     _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString(loginResponse.message)))
                 }
-
-
+            }
         }
     }
 }
-    }
 
 
 

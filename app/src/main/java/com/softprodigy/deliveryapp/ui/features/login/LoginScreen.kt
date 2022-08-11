@@ -54,8 +54,8 @@ fun LoginScreen(
     val loginState = vm.loginUiState.value
     val context = LocalContext.current
 
-    val state=vm.googleUser.observeAsState()
-    val user=state.value
+    val state = vm.googleUser.observeAsState()
+    val user = state.value
     val isError = rememberSaveable { mutableStateOf(false) }
 
     val authResultLauncher =
@@ -65,7 +65,7 @@ fun LoginScreen(
                 Log.i("LoginScreen", "gsa: ${gsa}")
 
                 if (gsa != null) {
-                    vm.fetchSignInUser(gsa.email, gsa.displayName,gsa.id)
+                    vm.fetchSignInUser(gsa.email, gsa.displayName, gsa.id)
                 } else {
                     isError.value = true
                 }
@@ -73,7 +73,6 @@ fun LoginScreen(
                 Log.i("LoginScreen", "LoginScreen: ${e.toString()}")
             }
         }
-
 
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -199,47 +198,48 @@ fun LoginScreen(
                 isError = (!password.isValidPassword() && password.length >= 4),
                 errorMessage = stringResource(id = R.string.password_error)
             )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall))
-                AppText(
-                    text = stringResource(id = R.string.forgot_password),
-                    color = MaterialTheme.colors.primary,
-                    style = MaterialTheme.typography.h3,
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .clickable(onClick = onForgetPasswordClick)
-                )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-                AppButton(
-                    enabled = email.isValidEmail() && password.isValidPassword(),
-                    onClick = {
-                        vm.onEvent(
-                            LoginUIEvent.Submit(email, password)
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Text(text = stringResource(id = R.string.login))
-                }
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall))
+            AppText(
+                text = stringResource(id = R.string.forgot_password),
+                color = MaterialTheme.colors.primary,
+                style = MaterialTheme.typography.h3,
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .clickable(onClick = onForgetPasswordClick)
+            )
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+            AppButton(
+                enabled = email.isValidEmail() && password.isValidPassword(),
+                onClick = {
+                    vm.onEvent(
+                        LoginUIEvent.Submit(email, password)
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(text = stringResource(id = R.string.login))
+            }
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
             SocialSection(
                 headerText = stringResource(id = R.string.or_login_with),
                 footerText1 = stringResource(id = R.string.dont_have_account),
                 footerText2 = stringResource(id = R.string.create_now),
-                onGoogleClick = { onGoogleClick.invoke()
+                onGoogleClick = {
+                    onGoogleClick.invoke()
                     vm.showLoading()
                     authResultLauncher.launch(1)
-                                },
+                },
                 onFacebookClick = onFacebookClick,
                 onFooterClick = onCreateAccountClick
             )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
         }
         if (loginState.isDataLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
-        }
     }
+}
 
 
 @Preview("default", "rectangle")

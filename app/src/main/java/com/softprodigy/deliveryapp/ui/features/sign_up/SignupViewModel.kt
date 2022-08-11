@@ -9,6 +9,8 @@ import com.delivery_app.core.util.UiText
 import com.softprodigy.deliveryapp.common.*
 import com.softprodigy.deliveryapp.data.response.SignUpResponse
 import com.softprodigy.deliveryapp.R
+import com.softprodigy.deliveryapp.ui.features.login.LoginUIEvent
+import com.softprodigy.deliveryapp.ui.features.login.LoginUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -27,75 +29,26 @@ class SignupViewModel @Inject constructor(private var signUpRepository: SignUpRe
     var signupResponse: SignUpResponse? = null
         private set
 
-    private val _name = mutableStateOf("")
-    val name: State<String> = _name
-
-    private val _email = mutableStateOf("")
-    val email: State<String> = _email
-
-    private val _password = mutableStateOf("")
-    val password: State<String> = _password
-
-    private val _passwordVisibility = mutableStateOf(false)
-    val passwordVisibility: State<Boolean> = _passwordVisibility
-
-    private val _termsAccepted = mutableStateOf(false)
-    val termsAccepted: State<Boolean> = _termsAccepted
-
-
     fun onEvent(event: SignUpUIEvent) {
         when (event) {
 
-            is SignUpUIEvent.NameChange -> {
-                _name.value = event.name
-            }
-
-            is SignUpUIEvent.EmailChange -> {
-                _email.value = event.email
-            }
-            is SignUpUIEvent.PasswordChange -> {
-                _password.value = event.password
-
-            }
-            is SignUpUIEvent.PasswordToggleChange -> {
-                _passwordVisibility.value = event.showPassword
-            }
-            is SignUpUIEvent.ConfirmTermsChange -> {
-                _termsAccepted.value = event.acceptTerms
-            }
             is SignUpUIEvent.Submit -> {
-
-                viewModelScope.launch {
-                    if (!name.value.isValidFullName()) {
-                        _uiEvent.send(UiEvent.ShowToast(UiText.StringResource(R.string.enter_valid_full_name)))
-
-                    } else if (!email.value.isValidEmail()) {
-                        _uiEvent.send(UiEvent.ShowToast(UiText.StringResource(R.string.enter_valid_email)))
-
-                    } else if (!password.value.isValidPassword()) {
-                        _uiEvent.send(UiEvent.ShowToast(UiText.StringResource(R.string.password_error)))
-
-                    } else if (!termsAccepted.value) {
-                        _uiEvent.send(UiEvent.ShowToast(UiText.StringResource(R.string.please_accept_tems)))
-
-                    } else {
-                        signUp()
-                    }
-                }
+                signUp(event.name, event.email, event.password)
             }
+
         }
     }
 
-    private fun signUp() {
+    private fun signUp(name: String, email: String, password: String) {
         viewModelScope.launch {
             _signUpUiState.value = SignUpUIState(isLoading = true)
 
             val signUpResponse =
                 signUpRepository.signUpWithDetails(
-                    firstName = name.value.split(" ").component1(),
-                    lastName = name.value.split(" ").component2(),
-                    email = email.value,
-                    password = password.value
+                    firstName = name.split(" ").component1(),
+                    lastName = name.split(" ").component2(),
+                    email = email,
+                    password = password
                 )
             when (signUpResponse) {
                 is ResultWrapper.NetworkError -> {
@@ -134,7 +87,6 @@ class SignupViewModel @Inject constructor(private var signUpRepository: SignUpRe
                                     )
                                 )
                             )
-
                         }
                     }
                 }
