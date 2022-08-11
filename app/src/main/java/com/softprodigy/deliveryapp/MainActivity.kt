@@ -14,16 +14,16 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.softprodigy.deliveryapp.ui.features.create_new_password.NewPasswordScreen
+import com.softprodigy.deliveryapp.ui.features.forgot_password.ForgotPasswordScreen
+import com.softprodigy.deliveryapp.ui.features.otp_verification.OTPVerificationScreen
 import com.softprodigy.deliveryapp.common.Route.FORGOT_PASSWORD_SCREEN
 import com.softprodigy.deliveryapp.common.Route.LOGIN_SCREEN
 import com.softprodigy.deliveryapp.common.Route.NEW_PASSWORD_SCREEN
 import com.softprodigy.deliveryapp.common.Route.OTP_VERIFICATION_SCREEN
 import com.softprodigy.deliveryapp.common.Route.SIGN_UP_SCREEN
 import com.softprodigy.deliveryapp.common.Route.WELCOME_SCREEN
-import com.softprodigy.deliveryapp.ui.features.create_new_password.NewPasswordScreen
-import com.softprodigy.deliveryapp.ui.features.forgot_password.ForgotPasswordScreen
 import com.softprodigy.deliveryapp.ui.features.login.LoginScreen
-import com.softprodigy.deliveryapp.ui.features.otp_verification.OTPVerificationScreen
 import com.softprodigy.deliveryapp.ui.features.sign_up.SignUpScreen
 import com.softprodigy.deliveryapp.ui.features.welcome.WelcomeScreen
 import com.softprodigy.deliveryapp.ui.theme.DeliveryProjectStructureDemoTheme
@@ -71,7 +71,7 @@ fun NavControllerComposable() {
                     ).show()
                 },
                 onCreateAccountClick = { navController.navigate(SIGN_UP_SCREEN) },
-                onForgetPasswordClick = {},
+                onForgetPasswordClick = { navController.navigate(FORGOT_PASSWORD_SCREEN) },
                 onGoogleClick = {},
                 onFacebookClick = {})
         }
@@ -82,7 +82,7 @@ fun NavControllerComposable() {
             },
             onGoogleClick = {},
             onFacebookClick = {},
-            onLoginClick = {})
+            onLoginClick = { navController.navigate(LOGIN_SCREEN) })
         }
         composable(route = FORGOT_PASSWORD_SCREEN) {
             ForgotPasswordScreen(navController = navController)

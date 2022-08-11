@@ -1,6 +1,5 @@
-package com.example.deliveryprojectstructuredemo.ui.features.forgot_password
+package com.softprodigy.deliveryapp.ui.features.forgot_password
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -22,13 +21,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.deliveryprojectstructuredemo.R
-import com.example.deliveryprojectstructuredemo.common.Route
-import com.example.deliveryprojectstructuredemo.ui.features.components.AppButton
-import com.example.deliveryprojectstructuredemo.ui.features.components.AppOutlineTextField
-import com.example.deliveryprojectstructuredemo.ui.features.components.AppText
-import com.example.deliveryprojectstructuredemo.ui.features.login.LoginUIEvent
-import com.example.deliveryprojectstructuredemo.ui.theme.spacing
+
+import com.softprodigy.deliveryapp.R
+import com.softprodigy.deliveryapp.common.Route
+import com.softprodigy.deliveryapp.ui.features.components.AppButton
+import com.softprodigy.deliveryapp.ui.features.components.AppOutlineTextField
+import com.softprodigy.deliveryapp.ui.features.components.AppText
+import com.softprodigy.deliveryapp.ui.theme.spacing
 
 @Composable
 fun ForgotPasswordScreen(

@@ -1,4 +1,4 @@
-package com.example.deliveryprojectstructuredemo.ui.features.forgot_password
+package com.softprodigy.deliveryapp.ui.features.forgot_password
 
 
 sealed class ForgotPasswordUIEvent {

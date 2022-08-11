@@ -1,13 +1,10 @@
-package com.example.deliveryprojectstructuredemo.ui.features.otp_verification
+package com.softprodigy.deliveryapp.ui.features.otp_verification
 
-import com.example.deliveryprojectstructuredemo.common.ResultWrapper
-import com.example.deliveryprojectstructuredemo.common.safeApiCall
-import com.example.deliveryprojectstructuredemo.data.request.ForgotPasswordRequest
-import com.example.deliveryprojectstructuredemo.data.request.VerifyOtpRequest
-import com.example.deliveryprojectstructuredemo.data.response.ForgotPasswordResponse
-import com.example.deliveryprojectstructuredemo.data.response.VerifyOtpResponse
-import com.example.deliveryprojectstructuredemo.network.APIService
-import com.example.deliveryprojectstructuredemo.ui.features.forgot_password.ForgotPasswordRepository
+import com.softprodigy.deliveryapp.data.request.VerifyOtpRequest
+import com.softprodigy.deliveryapp.common.ResultWrapper
+import com.softprodigy.deliveryapp.common.safeApiCall
+import com.softprodigy.deliveryapp.data.response.VerifyOtpResponse
+import com.softprodigy.deliveryapp.network.APIService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject

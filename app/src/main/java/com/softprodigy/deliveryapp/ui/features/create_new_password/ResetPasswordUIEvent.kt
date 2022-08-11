@@ -1,6 +1,5 @@
-package com.example.deliveryprojectstructuredemo.ui.features.create_new_password
+package com.softprodigy.deliveryapp.ui.features.create_new_password
 
-import com.example.deliveryprojectstructuredemo.ui.features.login.LoginUIEvent
 
 sealed class ResetPasswordUIEvent {
 

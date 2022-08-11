@@ -1,7 +1,7 @@
-package com.example.deliveryprojectstructuredemo.data.response
+package com.softprodigy.deliveryapp.data.response
 
-import com.example.deliveryprojectstructuredemo.data.UserInfo
 import com.google.gson.annotations.SerializedName
+import com.softprodigy.deliveryapp.data.UserInfo
 
 class ResetPasswordResponse(
     @SerializedName("status") val status: Int,

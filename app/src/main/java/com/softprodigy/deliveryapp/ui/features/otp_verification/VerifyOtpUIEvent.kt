@@ -1,4 +1,4 @@
-package com.example.deliveryprojectstructuredemo.ui.features.otp_verification
+package com.softprodigy.deliveryapp.ui.features.otp_verification
 
 
 sealed class VerifyOtpUIEvent {

@@ -1,6 +1,7 @@
-package com.example.deliveryprojectstructuredemo.ui.features.forgot_password
+package com.softprodigy.deliveryapp.ui.features.forgot_password
 
-import com.example.deliveryprojectstructuredemo.data.UserInfo
+import com.softprodigy.deliveryapp.data.UserInfo
+
 
 data class ForgotPasswordUIState(
     var isLoading: Boolean = false,

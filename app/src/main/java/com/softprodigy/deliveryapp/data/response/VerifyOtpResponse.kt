@@ -1,6 +1,5 @@
-package com.example.deliveryprojectstructuredemo.data.response
+package com.softprodigy.deliveryapp.data.response
 
-import com.example.deliveryprojectstructuredemo.data.UserInfo
 import com.google.gson.annotations.SerializedName
 
 data class VerifyOtpResponse(

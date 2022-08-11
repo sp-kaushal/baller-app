@@ -1,17 +1,12 @@
-package com.example.deliveryprojectstructuredemo.ui.features.forgot_password
+package com.softprodigy.deliveryapp.ui.features.forgot_password
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.deliveryprojectstructuredemo.common.ResultWrapper
-import com.example.deliveryprojectstructuredemo.common.isValidEmail
-import com.example.deliveryprojectstructuredemo.common.isValidPassword
-import com.example.deliveryprojectstructuredemo.ui.features.login.LoginRepository
-import com.example.deliveryprojectstructuredemo.ui.features.login.LoginUIEvent
-import com.example.deliveryprojectstructuredemo.ui.features.login.LoginUIState
+
+import com.softprodigy.deliveryapp.common.ResultWrapper
+import com.softprodigy.deliveryapp.common.isValidEmail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

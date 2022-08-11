@@ -1,6 +1,7 @@
-package com.example.deliveryprojectstructuredemo.ui.features.otp_verification
+package com.softprodigy.deliveryapp.ui.features.otp_verification
 
-import com.example.deliveryprojectstructuredemo.data.UserInfo
+import com.softprodigy.deliveryapp.data.UserInfo
+
 
 data class VerifyOtpUIState(
     var isLoading: Boolean = false,

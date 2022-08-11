@@ -1,10 +1,11 @@
-package com.example.deliveryprojectstructuredemo.ui.features.forgot_password
+package com.softprodigy.deliveryapp.ui.features.forgot_password
 
-import com.example.deliveryprojectstructuredemo.common.ResultWrapper
-import com.example.deliveryprojectstructuredemo.common.safeApiCall
-import com.example.deliveryprojectstructuredemo.data.request.ForgotPasswordRequest
-import com.example.deliveryprojectstructuredemo.data.response.ForgotPasswordResponse
-import com.example.deliveryprojectstructuredemo.network.APIService
+
+import com.softprodigy.deliveryapp.data.request.ForgotPasswordRequest
+import com.softprodigy.deliveryapp.common.ResultWrapper
+import com.softprodigy.deliveryapp.common.safeApiCall
+import com.softprodigy.deliveryapp.data.response.ForgotPasswordResponse
+import com.softprodigy.deliveryapp.network.APIService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject

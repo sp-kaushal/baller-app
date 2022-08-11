@@ -1,15 +1,10 @@
-package com.example.deliveryprojectstructuredemo.ui.features.otp_verification
+package com.softprodigy.deliveryapp.ui.features.otp_verification
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.deliveryprojectstructuredemo.common.ResultWrapper
-import com.example.deliveryprojectstructuredemo.common.isValidEmail
-import com.example.deliveryprojectstructuredemo.ui.features.forgot_password.ForgotPasswordRepository
-import com.example.deliveryprojectstructuredemo.ui.features.forgot_password.ForgotPasswordUIEvent
-import com.example.deliveryprojectstructuredemo.ui.features.forgot_password.ForgotPasswordUIState
+import com.softprodigy.deliveryapp.common.ResultWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -81,6 +76,5 @@ class VerifyOtpViewModel @Inject constructor(
                 }
             }
         }
-
     }
 }

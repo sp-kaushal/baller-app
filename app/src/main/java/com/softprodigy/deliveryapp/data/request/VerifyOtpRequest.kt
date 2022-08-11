@@ -1,4 +1,4 @@
-package com.example.deliveryprojectstructuredemo.data.request
+package com.softprodigy.deliveryapp.data.request
 
 import com.google.gson.annotations.SerializedName
 
