@@ -9,7 +9,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.example.deliveryprojectstructuredemo"
+        applicationId "com.softprodigy.deliveryapp"
         minSdk 21
         targetSdk 32
         versionCode 1
@@ -46,10 +46,10 @@ android {
         }
     }
 
-    flavorDimensions.add("delivery-app")
+    flavorDimensions.add("deliveryapp")
     productFlavors {
         create("demo") {
-            dimension = "delivery-app"
+            dimension = "deliveryapp"
             buildConfigField("String", "API_SERVER", "\"http://delivery-app.softprodigyphp.in\"")
             buildConfigField("String", "SERVER", "\"http://delivery-app.softprodigyphp.in\"")
             buildConfigField("Integer", "CONNECT_TIMEOUT", "120")
@@ -58,7 +58,7 @@ android {
             applicationIdSuffix = ".demo"
         }
         create("develop") {
-            dimension = "delivery-app"
+            dimension = "deliveryapp"
             buildConfigField("String", "API_SERVER", "\"http://delivery-app.softprodigyphp.in\"")
             buildConfigField("String", "SERVER", "\"http://delivery-app.softprodigyphp.in\"")
             buildConfigField("Integer", "CONNECT_TIMEOUT", "120")
@@ -66,7 +66,7 @@ android {
             buildConfigField("Integer", "READ_TIMEOUT", "120")
         }
         create("qa") {
-            dimension = "delivery-app"
+            dimension = "deliveryapp"
             buildConfigField("String", "API_SERVER", "\"http://delivery-app.softprodigyphp.in\"")
             buildConfigField("String", "SERVER", "\"http://delivery-app.softprodigyphp.in\"")
             buildConfigField("Integer", "CONNECT_TIMEOUT", "120")
@@ -116,6 +116,9 @@ dependencies {
     implementation("com.squareup.moshi:moshi-kotlin:1.13.0")
     //Timber
     implementation(Timber.logger)
+
+    implementation 'com.google.android.gms:play-services-auth:20.2.0'
+    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
 
     //ApiResponse
     implementation("com.slack.eithernet:eithernet:$eithernet_version")

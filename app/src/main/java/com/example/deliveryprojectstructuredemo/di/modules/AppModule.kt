@@ -5,14 +5,8 @@ import com.example.deliveryprojectstructuredemo.BuildConfig
 import com.example.deliveryprojectstructuredemo.DeliveryApp
 import com.example.deliveryprojectstructuredemo.common.ApiConstants
 import com.example.deliveryprojectstructuredemo.network.APIService
-import com.example.deliveryprojectstructuredemo.ui.features.create_new_password.ResetPasswordRepoImpl
-import com.example.deliveryprojectstructuredemo.ui.features.create_new_password.ResetPasswordRepository
-import com.example.deliveryprojectstructuredemo.ui.features.forgot_password.ForgotPasswordRepoImpl
-import com.example.deliveryprojectstructuredemo.ui.features.forgot_password.ForgotPasswordRepository
 import com.example.deliveryprojectstructuredemo.ui.features.login.LoginRepository
 import com.example.deliveryprojectstructuredemo.ui.features.login.RepositoryImpl
-import com.example.deliveryprojectstructuredemo.ui.features.otp_verification.VerifyOtpRepoImpl
-import com.example.deliveryprojectstructuredemo.ui.features.otp_verification.VerifyOtpRepository
 import com.example.deliveryprojectstructuredemo.ui.features.sign_up.SignUpRepoImpl
 import com.example.deliveryprojectstructuredemo.ui.features.sign_up.SignUpRepository
 import com.google.gson.FieldNamingPolicy
@@ -32,7 +26,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class AppModule {
 
-
+    @Singleton
+    @Provides
     fun provideApplication(@ApplicationContext app: Context): DeliveryApp {
         return app as DeliveryApp
     }
