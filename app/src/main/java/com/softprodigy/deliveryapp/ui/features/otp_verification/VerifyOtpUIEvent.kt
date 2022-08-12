@@ -3,7 +3,6 @@ package com.softprodigy.deliveryapp.ui.features.otp_verification
 
 sealed class VerifyOtpUIEvent {
 
-    data class OtpChange(val otp: String) : VerifyOtpUIEvent()
-    object Submit : VerifyOtpUIEvent()
-
+    data class Submit(val otp: String, val token: String) : VerifyOtpUIEvent()
+    data class ResendOtp(val email: String) : VerifyOtpUIEvent()
 }

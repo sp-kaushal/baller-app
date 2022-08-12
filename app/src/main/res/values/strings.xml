@@ -38,11 +38,12 @@
     <string name="generic_error">Generic Error</string>
     <string name="email_error">Enter a valid Email</string>
     <string name="password_error">Password must have at least 6 characters with a lowercase letter, an uppercase letter and a number</string>
-    <string name="forgot_password_subtitle">Enter registered e-mail to recive password reset instruction.</string>
+    <string name="confirm_password_error">Confirm Password must be same as password </string>
+    <string name="forgot_password_subtitle">Enter registered e-mail to receive password reset instruction.</string>
     <string name="send">Send</string>
     <string name="back_to_login">Back To Login</string>
     <string name="otp_verifcation">OTP Verification</string>
-    <string name="please_enter_4_digit_code">Please enter the 4 digit code sent to %1$s </string>
+    <string name="please_enter_4_digit_code">Please enter the 6 digit code sent to %1$s </string>
     <string name="verify">Verify</string>
     <string name="resend_code">Resend Code</string>
     <string name="create_new_password">Create New Password</string>
