@@ -65,7 +65,9 @@ class ForgotPasswordViewModel @Inject constructor(
                     _forgotPassUiState.value = forgotPassUiState.value.copy(isLoading = false)
 
                     _forgotPassUiState.value =
-                        forgotPassUiState.value.copy(errorMessage = "${forgotPassResponse.code} ${forgotPassResponse.message}")
+                        ForgotPasswordUIState(errorMessage = "${forgotPassResponse.code} ${forgotPassResponse.message}")
+                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString("${forgotPassResponse.code} ${forgotPassResponse.message}")))
+
                 }
                 is ResultWrapper.Success -> {
 
@@ -73,7 +75,6 @@ class ForgotPasswordViewModel @Inject constructor(
                         if (response.status == 200) {
                             _forgotPassUiState.value =
                                 ForgotPasswordUIState(message = response.message)
-
                             forgotResponse = response
                             _uiEvent.send(UiEvent.Success)
                         } else {

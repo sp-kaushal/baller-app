@@ -8,6 +8,7 @@ import com.softprodigy.deliveryapp.data.response.ResetPasswordResponse
 import com.softprodigy.deliveryapp.data.response.VerifyOtpResponse
 import com.softprodigy.deliveryapp.common.ApiConstants
 import com.softprodigy.deliveryapp.data.request.LoginRequest
+import com.softprodigy.deliveryapp.data.request.ResendOtpRequest
 import com.softprodigy.deliveryapp.data.request.SignUpRequest
 import com.softprodigy.deliveryapp.data.response.LoginResponse
 import com.softprodigy.deliveryapp.data.response.SignUpResponse
@@ -18,10 +19,10 @@ import retrofit2.http.Path
 interface APIService {
 
     @POST(ApiConstants.LOGIN)
-    suspend fun userLogin(@Body loginRequest: LoginRequest):LoginResponse
+    suspend fun userLogin(@Body loginRequest: LoginRequest): LoginResponse
 
     @POST(ApiConstants.SIGNUP)
-    suspend fun userSignUp(@Body signUpRequest: SignUpRequest):SignUpResponse
+    suspend fun userSignUp(@Body signUpRequest: SignUpRequest): SignUpResponse
 
     @POST(ApiConstants.FORGOT_PASSWORD)
     suspend fun forgotPassword(@Body forgotPasswordRequest: ForgotPasswordRequest): ForgotPasswordResponse
@@ -37,4 +38,7 @@ interface APIService {
         @Path("token") token: String,
         @Body resetPasswordRequest: ResetPasswordRequest
     ): ResetPasswordResponse
+
+    @POST(ApiConstants.RESEND_OTP)
+    suspend fun resendOtp(@Body resendOtpRequest: ResendOtpRequest): ForgotPasswordResponse
 }

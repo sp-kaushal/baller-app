@@ -28,6 +28,8 @@ import com.delivery_app.core.util.UiEvent
 import com.softprodigy.deliveryapp.R
 import com.softprodigy.deliveryapp.common.Route
 import com.softprodigy.deliveryapp.common.isValidEmail
+import com.softprodigy.deliveryapp.data.response.ForgotPasswordResponse
+import com.softprodigy.deliveryapp.data.response.SignUpResponse
 import com.softprodigy.deliveryapp.ui.features.components.AppButton
 import com.softprodigy.deliveryapp.ui.features.components.AppOutlineTextField
 import com.softprodigy.deliveryapp.ui.features.components.AppText
@@ -35,7 +37,9 @@ import com.softprodigy.deliveryapp.ui.theme.spacing
 
 @Composable
 fun ForgotPasswordScreen(
-    navController: NavController,
+    onOtpClick: (ForgotPasswordResponse) -> Unit,
+    onSuccess: (ForgotPasswordResponse) -> Unit,
+    onLoginClick: () -> Unit,
     vm: ForgotPasswordViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -47,9 +51,8 @@ fun ForgotPasswordScreen(
             when (uiEvent) {
                 is UiEvent.Success -> {
                     vm.forgotResponse?.let {
-                        Toast.makeText(context, it.message, Toast.LENGTH_LONG)
-                            .show()
-                        navController.navigate(Route.OTP_VERIFICATION_SCREEN + "/${it.verifyToken}")
+                        onSuccess(it)
+                        onOtpClick(it)
                     }
                 }
                 is UiEvent.ShowToast -> {
@@ -129,7 +132,7 @@ fun ForgotPasswordScreen(
                 color = MaterialTheme.colors.primary,
                 modifier = Modifier
                     .clickable {
-                        navController.navigate(Route.LOGIN_SCREEN)
+                        onLoginClick()
                     }
             )
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))

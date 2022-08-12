@@ -34,6 +34,7 @@ import com.softprodigy.deliveryapp.R
 import com.softprodigy.deliveryapp.common.Route
 import com.softprodigy.deliveryapp.common.isValidPassword
 import com.softprodigy.deliveryapp.common.passwordMatches
+import com.softprodigy.deliveryapp.data.response.ResetPasswordResponse
 import com.softprodigy.deliveryapp.ui.features.components.AppButton
 import com.softprodigy.deliveryapp.ui.features.components.AppOutlineTextField
 import com.softprodigy.deliveryapp.ui.features.components.AppText
@@ -43,12 +44,12 @@ import kotlinx.coroutines.flow.receiveAsFlow
 
 @Composable
 fun NewPasswordScreen(
-    navController: NavController,
+    OnLoginScreen: () -> Unit,
+    OnSuccess: (ResetPasswordResponse) -> Unit,
     token: String,
     resetPasswordViewModel: ResetPasswordViewModel = hiltViewModel()
 ) {
 
-    val verifyResetPassState = resetPasswordViewModel.resetPassUiState.value
     val context = LocalContext.current
     val forgotPassState = resetPasswordViewModel.resetPassUiState.value
 
@@ -63,9 +64,8 @@ fun NewPasswordScreen(
             when (uiEvent) {
                 is UiEvent.Success -> {
                     resetPasswordViewModel.resetPasswordResponse?.let {
-                        Toast.makeText(context, it.message, Toast.LENGTH_LONG)
-                            .show()
-                        navController.navigate(Route.LOGIN_SCREEN)
+                        OnSuccess(it)
+                        OnLoginScreen()
                     }
                 }
                 is UiEvent.ShowToast -> {
@@ -151,7 +151,9 @@ fun NewPasswordScreen(
                 placeholder = { Text(text = stringResource(id = R.string.re_enter_password)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 errorMessage = stringResource(id = R.string.confirm_password_error),
-                isError = (!confirmPassword.isValidPassword() && !confirmPassword.passwordMatches(password)),
+                isError = (!confirmPassword.isValidPassword() && !confirmPassword.passwordMatches(
+                    password
+                )),
                 visualTransformation = if (confirmPasswordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = {

@@ -240,9 +240,9 @@ fun SignUpScreen(
             }
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
             SocialSection(
-                onGoogleClick = { onGoogleClick },
-                onFacebookClick = { onFacebookClick },
-                onFooterClick = { onLoginClick })
+                onGoogleClick = { onGoogleClick() },
+                onFacebookClick = { onFacebookClick() },
+                onFooterClick = { onLoginClick() })
 
         }
         if (signUpState.isLoading) {

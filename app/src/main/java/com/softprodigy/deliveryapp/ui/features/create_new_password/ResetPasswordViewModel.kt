@@ -63,7 +63,8 @@ class ResetPasswordViewModel @Inject constructor(private var resetPasswordReposi
                     _resetPassUiState.value = resetPassUiState.value.copy(isLoading = false)
 
                     _resetPassUiState.value =
-                        resetPassUiState.value.copy(errorMessage = "${resetPassResponse.code} ${resetPassResponse.message}")
+                        ResetPasswordUIState(errorMessage = "${resetPassResponse.code} ${resetPassResponse.message}")
+                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString("${resetPassResponse.code} ${resetPassResponse.message}")))
 
                 }
                 is ResultWrapper.Success -> {
@@ -72,7 +73,6 @@ class ResetPasswordViewModel @Inject constructor(private var resetPasswordReposi
                         if (response.status == 200) {
                             _resetPassUiState.value =
                                 ResetPasswordUIState(message = response.message)
-
                             resetPasswordResponse = response
                             _uiEvent.send(UiEvent.Success)
                         } else {

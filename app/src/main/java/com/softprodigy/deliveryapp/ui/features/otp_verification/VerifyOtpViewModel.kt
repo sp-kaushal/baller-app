@@ -4,41 +4,105 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.delivery_app.core.util.UiEvent
+import com.delivery_app.core.util.UiText
+import com.softprodigy.deliveryapp.common.AppConstants
 import com.softprodigy.deliveryapp.common.ResultWrapper
+import com.softprodigy.deliveryapp.data.response.ForgotPasswordResponse
+import com.softprodigy.deliveryapp.data.response.ResetPasswordResponse
+import com.softprodigy.deliveryapp.data.response.VerifyOtpResponse
+import com.softprodigy.deliveryapp.ui.features.forgot_password.ForgotPasswordRepository
+import com.softprodigy.deliveryapp.ui.features.forgot_password.ForgotPasswordUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class VerifyOtpViewModel @Inject constructor(
-    private var repository: VerifyOtpRepository
+    private var repository: VerifyOtpRepository,
 ) : ViewModel() {
 
-    private val _otp = mutableStateOf("")
-    val otp: State<String> = _otp
-    val token = mutableStateOf("")
+    private val _uiEvent = Channel<UiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
+
     private val _verifyOtpUiState = mutableStateOf(VerifyOtpUIState())
     val verifyOtpUiState: State<VerifyOtpUIState> = _verifyOtpUiState
+
+    private val _resendPassUiState = mutableStateOf(ForgotPasswordUIState())
+    val resendPassUiState: State<ForgotPasswordUIState> = _resendPassUiState
+
+    var otpResponse: VerifyOtpResponse? = null
+        private set
+
+    var forgotResponse: ForgotPasswordResponse? = null
+        private set
 
     fun onEvent(event: VerifyOtpUIEvent) {
         when (event) {
 
-            is VerifyOtpUIEvent.OtpChange -> {
-                _otp.value = event.otp
-            }
-
             is VerifyOtpUIEvent.Submit -> {
-                if (otp.value.isEmpty()) {
-                    _verifyOtpUiState.value =
-                        verifyOtpUiState.value.copy(errorMessage = "Please enter valid OTP")
-                } else {
-                    confirm()
+                confirm(event.otp, event.token)
+            }
+            is VerifyOtpUIEvent.ResendOtp -> {
+                resendOtp(event.email)
+            }
+        }
+    }
+
+    private fun resendOtp(email: String) {
+
+        viewModelScope.launch {
+
+            _resendPassUiState.value = resendPassUiState.value.copy(isLoading = true)
+
+            val resendPassResponse =
+                repository.resendOtp(
+                    email = email,
+                    mobile = "",
+                    otpType = "email"
+                )
+            when (resendPassResponse) {
+                is ResultWrapper.NetworkError -> {
+
+                    _resendPassUiState.value =
+                        ForgotPasswordUIState(errorMessage = resendPassResponse.message)
+                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString(resendPassResponse.message)))
+                }
+                is ResultWrapper.GenericError -> {
+
+                    _resendPassUiState.value = resendPassUiState.value.copy(isLoading = false)
+
+                    _resendPassUiState.value =
+                        ForgotPasswordUIState(errorMessage = "${resendPassResponse.code} ${resendPassResponse.message}")
+                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString("${resendPassResponse.code} ${resendPassResponse.message}")))
+
+                }
+                is ResultWrapper.Success -> {
+
+                    resendPassResponse.value.let { response ->
+                        if (response.status == 200) {
+                            _resendPassUiState.value =
+                                ForgotPasswordUIState(message = response.message)
+                            forgotResponse = response
+                            _uiEvent.send(UiEvent.GenerateOtp)
+                        } else {
+                            _uiEvent.send(
+                                UiEvent.ShowToast(
+                                    UiText.DynamicString(
+                                        response.message ?: AppConstants.DEFAULT_ERROR_MESSAGE
+                                    )
+                                )
+                            )
+                        }
+                    }
                 }
             }
         }
     }
 
-    private fun confirm() {
+    private fun confirm(otp: String, token: String) {
 
         viewModelScope.launch {
 
@@ -46,32 +110,43 @@ class VerifyOtpViewModel @Inject constructor(
 
             val verifyOtpResponse =
                 repository.verifyOtp(
-                    token = token.value,
-                    otp = otp.value,
+                    token = token,
+                    otp = otp,
                     otpType = "email"
                 )
 
             when (verifyOtpResponse) {
+
                 is ResultWrapper.NetworkError -> {
-                    _verifyOtpUiState.value = verifyOtpUiState.value.copy(isLoading = false)
                     _verifyOtpUiState.value =
-                        verifyOtpUiState.value.copy(errorMessage = verifyOtpResponse.toString())
+                        VerifyOtpUIState(errorMessage = verifyOtpResponse.message)
+                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString(verifyOtpResponse.message)))
                 }
+
                 is ResultWrapper.GenericError -> {
                     _verifyOtpUiState.value = verifyOtpUiState.value.copy(isLoading = false)
                     _verifyOtpUiState.value =
                         verifyOtpUiState.value.copy(errorMessage = verifyOtpResponse.message)
+                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString("${verifyOtpResponse.code} ${verifyOtpResponse.message}")))
                 }
+
                 is ResultWrapper.Success -> {
                     _verifyOtpUiState.value = verifyOtpUiState.value.copy(isLoading = false)
-                    if (verifyOtpResponse.value.status == 200) {
-                        _verifyOtpUiState.value =
-                            verifyOtpUiState.value.copy(message = verifyOtpResponse.value.message)
-                    } else {
-                        _verifyOtpUiState.value = verifyOtpUiState.value.copy(
-                            errorMessage = verifyOtpResponse.value.message
-                                ?: "Something went wrong"
-                        )
+                    verifyOtpResponse.value.let { response ->
+                        if (response.status == 200) {
+                            _verifyOtpUiState.value =
+                                VerifyOtpUIState(message = response.message)
+                            otpResponse = response
+                            _uiEvent.send(UiEvent.Success)
+                        } else {
+                            _uiEvent.send(
+                                UiEvent.ShowToast(
+                                    UiText.DynamicString(
+                                        response.message ?: AppConstants.DEFAULT_ERROR_MESSAGE
+                                    )
+                                )
+                            )
+                        }
                     }
                 }
             }
