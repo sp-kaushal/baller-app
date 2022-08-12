@@ -1,8 +1,8 @@
 package com.softprodigy.deliveryapp.ui.features.sign_up
 
 import android.content.res.Configuration
-import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -30,21 +30,25 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.delivery_app.core.util.UiEvent
+import com.google.android.gms.common.api.ApiException
 import com.softprodigy.deliveryapp.R
+import com.softprodigy.deliveryapp.data.GoogleUserModel
+import com.softprodigy.deliveryapp.data.response.LoginResponse
 import com.softprodigy.deliveryapp.data.response.SignUpResponse
 import com.softprodigy.deliveryapp.ui.features.components.AppButton
 import com.softprodigy.deliveryapp.ui.features.components.AppOutlineTextField
 import com.softprodigy.deliveryapp.ui.features.components.AppText
 import com.softprodigy.deliveryapp.ui.features.components.SocialSection
+import com.softprodigy.deliveryapp.ui.features.login.GoogleApiContract
 import com.softprodigy.deliveryapp.ui.theme.DeliveryProjectStructureDemoTheme
 import com.softprodigy.deliveryapp.ui.theme.spacing
+import timber.log.Timber
 
 @Composable
 fun SignUpScreen(
     vm: SignupViewModel = hiltViewModel(),
     onSuccessfulSignUp: (SignUpResponse) -> Unit,
-    onGoogleClick: () -> Unit,
+    onGoogleClick: (LoginResponse) -> Unit,
     onFacebookClick: () -> Unit,
     onLoginClick: () -> Unit,
 ) {
@@ -52,19 +56,38 @@ fun SignUpScreen(
     val signUpState = vm.signUpUIState.value
     val context = LocalContext.current
 
+
+    val authResultLauncher =
+        rememberLauncherForActivityResult(contract = GoogleApiContract()) { task ->
+            try {
+                val gsa = task?.getResult(ApiException::class.java)
+                if (gsa != null) {
+                    val googleUser = GoogleUserModel(
+                        email = gsa.email,
+                        name = gsa.displayName,
+                        id = gsa.id,
+                        token = gsa.idToken
+                    )
+                    vm.onEvent(SignUpUIEvent.OnGoogleClick(googleUser))
+                }
+            } catch (e: ApiException) {
+                Timber.i(e.toString())
+            }
+        }
+
     LaunchedEffect(key1 = true) {
         vm.uiEvent.collect { uiEvent ->
             when (uiEvent) {
-                is UiEvent.Success -> {
-                    vm.signupResponse?.let {
-                        onSuccessfulSignUp(it)
-                    }
+                is SignUpChannel.OnLoginSuccess -> {
+                    onGoogleClick.invoke(uiEvent.loginResponse)
                 }
-                is UiEvent.ShowToast -> {
+                is SignUpChannel.ShowToast -> {
                     Toast.makeText(context, uiEvent.message.asString(context), Toast.LENGTH_LONG)
                         .show()
                 }
-                else -> Unit
+                is SignUpChannel.OnSignUpSuccess -> {
+                    onSuccessfulSignUp.invoke(uiEvent.signUpResponse)
+                }
             }
         }
     }
@@ -187,7 +210,7 @@ fun SignUpScreen(
                                 start = offset,
                                 end = offset
                             ).firstOrNull()?.let {
-                                Log.d("policy URL", it.item)
+                                Timber.i(it.item)
                                 uriHandler.openUri(it.item)
 
                             }
@@ -197,7 +220,7 @@ fun SignUpScreen(
                                 start = offset,
                                 end = offset
                             ).firstOrNull()?.let {
-                                Log.d("terms URL", it.item)
+                                Timber.i(it.item)
                                 uriHandler.openUri(it.item)
 
                             }
@@ -217,9 +240,11 @@ fun SignUpScreen(
             }
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
             SocialSection(
-                onGoogleClick = { onGoogleClick },
-                onFacebookClick = { onFacebookClick },
-                onFooterClick = { onLoginClick })
+                onGoogleClick = {
+                    authResultLauncher.launch(0)
+                },
+                onFacebookClick = { onFacebookClick.invoke() },
+                onFooterClick = { onLoginClick.invoke() })
 
         }
         if (signUpState.isLoading) {

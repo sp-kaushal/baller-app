@@ -45,6 +45,7 @@ import com.softprodigy.deliveryapp.ui.features.components.AppText
 import com.softprodigy.deliveryapp.ui.theme.spacing
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -124,7 +125,7 @@ fun OTPVerificationScreen(
                     value = editValue,
                     onValueChange = {
                         if (it.length <= otpLength) {
-                            Log.d("harsh", "OTPVerificationScreen: $it")
+                            Timber.d("OTPVerificationScreen: " + it)
                             setEditValue(it)
                             vm.onEvent(VerifyOtpUIEvent.OtpChange(it))
                         }

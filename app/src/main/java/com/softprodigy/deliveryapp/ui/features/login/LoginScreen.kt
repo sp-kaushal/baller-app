@@ -1,7 +1,6 @@
 package com.softprodigy.deliveryapp.ui.features.login
 
 import android.content.res.Configuration
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
@@ -15,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,48 +27,52 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.delivery_app.core.util.UiEvent
+import com.google.android.gms.common.api.ApiException
 import com.softprodigy.deliveryapp.R
 import com.softprodigy.deliveryapp.common.isValidEmail
 import com.softprodigy.deliveryapp.common.isValidPassword
-import com.softprodigy.deliveryapp.data.UserInfo
+import com.softprodigy.deliveryapp.data.GoogleUserModel
+import com.softprodigy.deliveryapp.data.response.LoginResponse
 import com.softprodigy.deliveryapp.ui.features.components.AppButton
 import com.softprodigy.deliveryapp.ui.features.components.AppOutlineTextField
 import com.softprodigy.deliveryapp.ui.features.components.AppText
 import com.softprodigy.deliveryapp.ui.features.components.SocialSection
 import com.softprodigy.deliveryapp.ui.theme.DeliveryProjectStructureDemoTheme
 import com.softprodigy.deliveryapp.ui.theme.spacing
-import com.google.android.gms.common.api.ApiException
+import timber.log.Timber
 
 @Composable
 fun LoginScreen(
     vm: LoginViewModel = hiltViewModel(),
-    onLoginSuccess: (UserInfo) -> Unit,
+    onLoginSuccess: (LoginResponse) -> Unit,
     onForgetPasswordClick: () -> Unit,
-    onGoogleClick: () -> Unit,
     onFacebookClick: () -> Unit,
     onCreateAccountClick: () -> Unit
 ) {
     val loginState = vm.loginUiState.value
     val context = LocalContext.current
 
-    val state=vm.googleUser.observeAsState()
-    val user=state.value
     val isError = rememberSaveable { mutableStateOf(false) }
 
     val authResultLauncher =
         rememberLauncherForActivityResult(contract = GoogleApiContract()) { task ->
             try {
                 val gsa = task?.getResult(ApiException::class.java)
-                Log.i("LoginScreen", "gsa: ${gsa}")
+                Timber.i("gsa: $gsa")
 
                 if (gsa != null) {
-                    vm.fetchSignInUser(gsa.email, gsa.displayName,gsa.id)
+                    val googleUser = GoogleUserModel(
+                        email = gsa.email,
+                        name = gsa.displayName,
+                        id = gsa.id,
+                        token = gsa.idToken
+                    )
+                    vm.onEvent(LoginUIEvent.OnGoogleClick(googleUser))
                 } else {
                     isError.value = true
                 }
             } catch (e: ApiException) {
-                Log.i("LoginScreen", "LoginScreen: ${e.toString()}")
+                Timber.i("LoginScreen: $e")
             }
         }
 
@@ -82,50 +84,17 @@ fun LoginScreen(
     LaunchedEffect(key1 = Unit) {
         vm.uiEvent.collect { uiEvent ->
             when (uiEvent) {
-                is UiEvent.Success -> {
-                    vm.userInfo?.let {
-                        onLoginSuccess(it)
-                    }
-                }
-                is UiEvent.ShowToast -> {
+                is LoginChannel.ShowToast -> {
                     Toast.makeText(context, uiEvent.message.asString(context), Toast.LENGTH_LONG)
                         .show()
+                }
+                is LoginChannel.OnLoginSuccess -> {
+                    onLoginSuccess.invoke(uiEvent.loginResponse)
                 }
                 else -> Unit
             }
         }
     }
-
-
-
-    user?.let {
-        vm.hideLoading()
-        Log.i("gsa", "gsa:$it ")
-        Toast.makeText(context, "$it", Toast.LENGTH_SHORT).show()
-    }
-
-
-/*    loginState.let { state ->
-        if (state.isDataLoading) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Center) {
-                CircularProgressIndicator()
-            }
-        }
-        state.errorMessage?.let {
-            Toast.makeText(context, "$it", Toast.LENGTH_SHORT).show()
-            state.errorMessage = null
-        }
-
-        state.user?.let {
-            Toast.makeText(
-                context,
-                "Welcome ${it.firstName} ${it.lastName}",
-                Toast.LENGTH_SHORT
-            ).show()
-            state.user = null
-        }
-    }*/
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -226,10 +195,9 @@ fun LoginScreen(
                 headerText = stringResource(id = R.string.or_login_with),
                 footerText1 = stringResource(id = R.string.dont_have_account),
                 footerText2 = stringResource(id = R.string.create_now),
-                onGoogleClick = { onGoogleClick.invoke()
-                    vm.showLoading()
+                onGoogleClick = {
                     authResultLauncher.launch(1)
-                                },
+                },
                 onFacebookClick = onFacebookClick,
                 onFooterClick = onCreateAccountClick
             )
@@ -249,7 +217,6 @@ fun LoginScreen(
 private fun RectangleButtonPreview() {
     DeliveryProjectStructureDemoTheme {
         Surface {
-//            LoginScreen()
         }
     }
 }

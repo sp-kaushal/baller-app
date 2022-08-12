@@ -1,14 +1,10 @@
 package com.softprodigy.deliveryapp.network
 
-import com.softprodigy.deliveryapp.data.request.ForgotPasswordRequest
-import com.softprodigy.deliveryapp.data.request.ResetPasswordRequest
-import com.softprodigy.deliveryapp.data.request.VerifyOtpRequest
 import com.softprodigy.deliveryapp.data.response.ForgotPasswordResponse
 import com.softprodigy.deliveryapp.data.response.ResetPasswordResponse
 import com.softprodigy.deliveryapp.data.response.VerifyOtpResponse
 import com.softprodigy.deliveryapp.common.ApiConstants
-import com.softprodigy.deliveryapp.data.request.LoginRequest
-import com.softprodigy.deliveryapp.data.request.SignUpRequest
+import com.softprodigy.deliveryapp.data.request.*
 import com.softprodigy.deliveryapp.data.response.LoginResponse
 import com.softprodigy.deliveryapp.data.response.SignUpResponse
 import retrofit2.http.Body
@@ -19,6 +15,9 @@ interface APIService {
 
     @POST(ApiConstants.LOGIN)
     suspend fun userLogin(@Body loginRequest: LoginRequest):LoginResponse
+
+    @POST(ApiConstants.SOCIAL_LOGIN)
+    suspend fun socialLogin(@Body loginRequest: SocialLoginRequest):LoginResponse
 
     @POST(ApiConstants.SIGNUP)
     suspend fun userSignUp(@Body signUpRequest: SignUpRequest):SignUpResponse
