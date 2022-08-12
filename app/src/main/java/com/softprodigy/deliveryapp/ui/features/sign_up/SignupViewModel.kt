@@ -10,6 +10,9 @@ import com.softprodigy.deliveryapp.common.*
 import com.softprodigy.deliveryapp.data.response.LoginResponse
 import com.softprodigy.deliveryapp.data.response.SignUpResponse
 import com.softprodigy.deliveryapp.ui.features.welcome.SocialLoginRepo
+import com.softprodigy.deliveryapp.R
+import com.softprodigy.deliveryapp.ui.features.login.LoginUIEvent
+import com.softprodigy.deliveryapp.ui.features.login.LoginUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -43,6 +46,9 @@ class SignupViewModel @Inject constructor(
     private val _termsAccepted = mutableStateOf(false)
     val termsAccepted: State<Boolean> = _termsAccepted
 
+
+    var signupResponse: SignUpResponse? = null
+        private set
 
     fun onEvent(event: SignUpUIEvent) {
         when (event) {
@@ -95,6 +101,8 @@ class SignupViewModel @Inject constructor(
                 }
             }
             is SignUpUIEvent.Submit -> {
+                signUp(event.name, event.email, event.password)
+            }
 
                 viewModelScope.launch {
                     if (!name.value.isValidFullName()) {
@@ -118,15 +126,19 @@ class SignupViewModel @Inject constructor(
     }
 
     private fun signUp() {
+        }
+    }
+
+    private fun signUp(name: String, email: String, password: String) {
         viewModelScope.launch {
             _signUpUiState.value = SignUpUIState(isLoading = true)
 
             val signUpResponse =
                 signUpRepository.signUpWithDetails(
-                    firstName = name.value.split(" ").component1(),
-                    lastName = name.value.split(" ").component2(),
-                    email = email.value,
-                    password = password.value
+                    firstName = name.split(" ").component1(),
+                    lastName = name.split(" ").component2(),
+                    email = email,
+                    password = password
                 )
             when (signUpResponse) {
                 is ResultWrapper.NetworkError -> {
@@ -162,7 +174,6 @@ class SignupViewModel @Inject constructor(
                                     )
                                 )
                             )
-
                         }
                     }
                 }

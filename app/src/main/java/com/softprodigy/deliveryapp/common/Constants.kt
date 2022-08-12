@@ -26,6 +26,7 @@ object ApiConstants {
     const val FORGOT_PASSWORD = "/forgot/password"
     const val VERIFY_OTP = "/verifyOtp/"
     const val RESET_PASS = "/reset/password/"
+    const val RESEND_OTP = "/resendOtp"
     const val first_name="first_name"
     const val last_name="lastName"
     const val mobile="mobile"

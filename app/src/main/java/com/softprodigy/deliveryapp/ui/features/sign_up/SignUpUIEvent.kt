@@ -11,4 +11,7 @@ sealed class SignUpUIEvent {
     data class ConfirmTermsChange(val acceptTerms: Boolean) : SignUpUIEvent()
     data class OnGoogleClick(val googleUser: GoogleUserModel) : SignUpUIEvent()
     object Submit : SignUpUIEvent()
+
+    data class Submit(val name: String, val email: String, val password: String) : SignUpUIEvent()
+
 }

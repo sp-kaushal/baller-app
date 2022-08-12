@@ -197,7 +197,7 @@ fun LoginScreen(
                 footerText2 = stringResource(id = R.string.create_now),
                 onGoogleClick = {
                     authResultLauncher.launch(1)
-                },
+                                },
                 onFacebookClick = onFacebookClick,
                 onFooterClick = onCreateAccountClick
             )

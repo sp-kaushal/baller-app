@@ -15,6 +15,10 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,6 +38,9 @@ import com.google.android.gms.common.api.ApiException
 import com.softprodigy.deliveryapp.R
 import com.softprodigy.deliveryapp.data.GoogleUserModel
 import com.softprodigy.deliveryapp.data.response.LoginResponse
+import com.softprodigy.deliveryapp.common.isValidEmail
+import com.softprodigy.deliveryapp.common.isValidFullName
+import com.softprodigy.deliveryapp.common.isValidPassword
 import com.softprodigy.deliveryapp.data.response.SignUpResponse
 import com.softprodigy.deliveryapp.ui.features.components.AppButton
 import com.softprodigy.deliveryapp.ui.features.components.AppOutlineTextField
@@ -75,11 +82,24 @@ fun SignUpScreen(
             }
         }
 
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var passwordVisibility by rememberSaveable { mutableStateOf(false) }
+    var termsConditions by rememberSaveable { mutableStateOf(false) }
+    var name by rememberSaveable {
+        mutableStateOf("")
+    }
+
     LaunchedEffect(key1 = true) {
         vm.uiEvent.collect { uiEvent ->
             when (uiEvent) {
                 is SignUpChannel.OnLoginSuccess -> {
                     onGoogleClick.invoke(uiEvent.loginResponse)
+                is UiEvent.Success -> {
+                    vm.signupResponse?.let {
+                        onSuccessfulSignUp(it)
+                        onLoginClick()
+                    }
                 }
                 is SignUpChannel.ShowToast -> {
                     Toast.makeText(context, uiEvent.message.asString(context), Toast.LENGTH_LONG)
@@ -127,79 +147,85 @@ fun SignUpScreen(
             )
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
             AppOutlineTextField(
-                value = vm.name.value,
+                value = name,
                 label = { Text(text = stringResource(id = R.string.your_name)) },
                 modifier = Modifier.fillMaxWidth(),
                 onValueChange = {
-                        vm.onEvent(SignUpUIEvent.NameChange(it))
-                    },
-                    placeholder = { Text(text = stringResource(id = R.string.enter_your_name)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    name = it
+                },
+                placeholder = { Text(text = stringResource(id = R.string.enter_your_name)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                isError = (!name.isValidFullName() && name.length > 4),
+                errorMessage = stringResource(id = R.string.enter_valid_full_name)
+            )
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+            AppOutlineTextField(
+                value = email,
+                label = { Text(text = stringResource(id = R.string.email)) },
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = {
+                    email = it
+                },
+                placeholder = { Text(text = stringResource(id = R.string.enter_your_email)) },
+                isError = (!email.isValidEmail() && email.length >= 6),
+                errorMessage = stringResource(id = R.string.email_error),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            )
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+            AppOutlineTextField(
+                value = password,
+                label = { Text(text = stringResource(id = R.string.password)) },
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = {
+                    password = it
+                },
+                placeholder = { Text(text = stringResource(id = R.string.create_password)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                isError = (!password.isValidPassword() && password.length >= 4),
+                errorMessage = stringResource(id = R.string.password_error),
+                visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = {
+                        passwordVisibility = !passwordVisibility
+                    }) {
+                        Icon(
+                            imageVector = if (passwordVisibility)
+                                Icons.Filled.Visibility
+                            else
+                                Icons.Filled.VisibilityOff, ""
+                        )
+                    }
+                })
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = termsConditions,
+                    onCheckedChange = {
+                        termsConditions = !termsConditions
+                    }
                 )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-                AppOutlineTextField(
-                    value = vm.email.value,
-                    label = { Text(text = stringResource(id = R.string.email)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    onValueChange = {
-                        vm.onEvent(SignUpUIEvent.EmailChange(it))
-                    },
-                    placeholder = { Text(text = stringResource(id = R.string.enter_your_email)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-                AppOutlineTextField(
-                    value = vm.password.value,
-                    label = { Text(text = stringResource(id = R.string.password)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    onValueChange = {
-                        vm.onEvent(SignUpUIEvent.PasswordChange(it))
-                    },
-                    placeholder = { Text(text = stringResource(id = R.string.create_password)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    visualTransformation = if (vm.passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        IconButton(onClick = {
-                            vm.onEvent(SignUpUIEvent.PasswordToggleChange(!vm.passwordVisibility.value))
-                        }) {
-                            Icon(
-                                imageVector = if (vm.passwordVisibility.value)
-                                    Icons.Filled.Visibility
-                                else
-                                    Icons.Filled.VisibilityOff, ""
-                            )
-                        }
-                    })
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall))
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = vm.termsAccepted.value,
-                        onCheckedChange = {
-                            vm.onEvent(SignUpUIEvent.ConfirmTermsChange(it))
-                        }
+
+                val annotatedString = buildAnnotatedString {
+                    append(stringResource(id = R.string.by_creating_an_accound_you_agree))
+
+                    pushStringAnnotation(tag = "terms", annotation = "https://google.com/terms")
+                    withStyle(style = SpanStyle(color = MaterialTheme.colors.primary)) {
+                        append(stringResource(id = R.string.terms_of_service))
+                    }
+                    pop()
+
+                    append(" and ")
+
+                    pushStringAnnotation(
+                        tag = "policy",
+                        annotation = "https://google.com/privacy"
                     )
 
-                    val annotatedString = buildAnnotatedString {
-                        append(stringResource(id = R.string.by_creating_an_accound_you_agree))
-
-                        pushStringAnnotation(tag = "terms", annotation = "https://google.com/terms")
-                        withStyle(style = SpanStyle(color = MaterialTheme.colors.primary)) {
-                            append(stringResource(id = R.string.terms_of_service))
-                        }
-                        pop()
-
-                        append(" and ")
-
-                        pushStringAnnotation(
-                            tag = "policy",
-                            annotation = "https://google.com/privacy"
-                        )
-
-                        withStyle(style = SpanStyle(color = MaterialTheme.colors.primary)) {
-                            append(stringResource(id = R.string.privacy_policy))
-                        }
-                        pop()
+                    withStyle(style = SpanStyle(color = MaterialTheme.colors.primary)) {
+                        append(stringResource(id = R.string.privacy_policy))
                     }
+                    pop()
+                }
 
                     ClickableText(
                         text = annotatedString,
@@ -212,8 +238,19 @@ fun SignUpScreen(
                             ).firstOrNull()?.let {
                                 Timber.i(it.item)
                                 uriHandler.openUri(it.item)
+                ClickableText(
+                    text = annotatedString,
+                    style = MaterialTheme.typography.h2,
+                    onClick = { offset ->
+                        annotatedString.getStringAnnotations(
+                            tag = "policy",
+                            start = offset,
+                            end = offset
+                        ).firstOrNull()?.let {
+                            Log.d("policy URL", it.item)
+                            uriHandler.openUri(it.item)
 
-                            }
+                        }
 
                             annotatedString.getStringAnnotations(
                                 tag = "terms",
@@ -222,19 +259,27 @@ fun SignUpScreen(
                             ).firstOrNull()?.let {
                                 Timber.i(it.item)
                                 uriHandler.openUri(it.item)
+                        annotatedString.getStringAnnotations(
+                            tag = "terms",
+                            start = offset,
+                            end = offset
+                        ).firstOrNull()?.let {
+                            Log.d("terms URL", it.item)
+                            uriHandler.openUri(it.item)
 
-                            }
-                        })
-                }
+                        }
+                    })
+            }
 
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
             AppButton(
                 onClick = {
-                    vm.onEvent(SignUpUIEvent.Submit)
+                    vm.onEvent(SignUpUIEvent.Submit(name, email, password))
                 },
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                enabled = email.isValidEmail() && password.isValidPassword() && name.isValidFullName() && termsConditions
             ) {
                 Text(text = stringResource(id = R.string.create_account))
             }
@@ -245,13 +290,16 @@ fun SignUpScreen(
                 },
                 onFacebookClick = { onFacebookClick.invoke() },
                 onFooterClick = { onLoginClick.invoke() })
+                onGoogleClick = { onGoogleClick() },
+                onFacebookClick = { onFacebookClick() },
+                onFooterClick = { onLoginClick() })
 
         }
         if (signUpState.isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
-        }
     }
+}
 
 @Preview("default", "rectangle")
 @Preview("dark theme", "rectangle", uiMode = Configuration.UI_MODE_NIGHT_YES)

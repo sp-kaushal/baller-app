@@ -4,10 +4,18 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.delivery_app.core.util.UiEvent
+import com.delivery_app.core.util.UiText
+import com.softprodigy.deliveryapp.common.AppConstants
 import com.softprodigy.deliveryapp.common.ResultWrapper
 import com.softprodigy.deliveryapp.common.isValidPassword
+import com.softprodigy.deliveryapp.data.response.ForgotPasswordResponse
+import com.softprodigy.deliveryapp.data.response.ResetPasswordResponse
+import com.softprodigy.deliveryapp.ui.features.forgot_password.ForgotPasswordUIState
 
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,88 +23,67 @@ import javax.inject.Inject
 class ResetPasswordViewModel @Inject constructor(private var resetPasswordRepository: ResetPasswordRepository) :
     ViewModel() {
 
-    val token = mutableStateOf("")
+    private val _uiEvent = Channel<UiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
+
     private val _resetPassUiState = mutableStateOf(ResetPasswordUIState())
     val resetPassUiState: State<ResetPasswordUIState> = _resetPassUiState
 
-    private val _password = mutableStateOf("")
-    val password: State<String> = _password
-
-    private val _passwordVisibility = mutableStateOf(false)
-    val passwordVisibility: State<Boolean> = _passwordVisibility
-
-    private val _confirmPassword = mutableStateOf("")
-    val confirmPassword: State<String> = _confirmPassword
-
-    private val _confirmPasswordVisibility = mutableStateOf(false)
-    val confirmPasswordVisibility: State<Boolean> = _confirmPasswordVisibility
+    var resetPasswordResponse: ResetPasswordResponse? = null
+        private set
 
     fun onEvent(event: ResetPasswordUIEvent) {
         when (event) {
 
-            is ResetPasswordUIEvent.PasswordChange -> {
-                _password.value = event.password
-            }
-            is ResetPasswordUIEvent.PasswordToggleChange -> {
-                _passwordVisibility.value = event.showPassword
-            }
-            is ResetPasswordUIEvent.ConfirmPasswordChange -> {
-                _confirmPassword.value = event.password
-            }
-            is ResetPasswordUIEvent.ConfirmPasswordToggleChange -> {
-                _confirmPasswordVisibility.value = event.showPassword
-            }
             is ResetPasswordUIEvent.Submit -> {
-                if (!password.value.isValidPassword()) {
-                    _resetPassUiState.value =
-                        resetPassUiState.value.copy(errorMessage = "Password must have at least eight characters with a lowercase letter, an uppercase letter and a number")
-                } else if (password.value.isEmpty() || confirmPassword.value.isEmpty()) {
-                    _resetPassUiState.value =
-                        resetPassUiState.value.copy(errorMessage = "Enter valid password")
 
-                } else if (password.value != confirmPassword.value) {
-                    _resetPassUiState.value =
-                        resetPassUiState.value.copy(errorMessage = "Confirm password should be same as password")
-                } else {
-                    submit()
-                }
+                submit(event.token, event.password)
+
             }
         }
     }
 
-    private fun submit() {
+    private fun submit(token: String, password: String) {
         viewModelScope.launch {
 
             _resetPassUiState.value = resetPassUiState.value.copy(isLoading = true)
 
             val resetPassResponse =
                 resetPasswordRepository.resetPassword(
-                    token = token.value, password = confirmPassword.value
+                    token = token, password = password
                 )
             when (resetPassResponse) {
                 is ResultWrapper.NetworkError -> {
-                    _resetPassUiState.value = resetPassUiState.value.copy(isLoading = false)
                     _resetPassUiState.value =
-                        resetPassUiState.value.copy(errorMessage = resetPassResponse.toString())
+                        ResetPasswordUIState(errorMessage = resetPassResponse.message)
+                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString(resetPassResponse.message)))
 
                 }
                 is ResultWrapper.GenericError -> {
                     _resetPassUiState.value = resetPassUiState.value.copy(isLoading = false)
 
                     _resetPassUiState.value =
-                        resetPassUiState.value.copy(errorMessage = "${resetPassResponse.code} ${resetPassResponse.message}")
+                        ResetPasswordUIState(errorMessage = "${resetPassResponse.code} ${resetPassResponse.message}")
+                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString("${resetPassResponse.code} ${resetPassResponse.message}")))
 
                 }
                 is ResultWrapper.Success -> {
-                    _resetPassUiState.value = resetPassUiState.value.copy(isLoading = false)
-                    if (resetPassResponse.value.status == 200) {
-                        _resetPassUiState.value =
-                            resetPassUiState.value.copy(message = resetPassResponse.value.message)
-                    } else {
-                        _resetPassUiState.value = resetPassUiState.value.copy(
-                            errorMessage = resetPassResponse.value.message
-                                ?: "Something went wrong"
-                        )
+
+                    resetPassResponse.value.let { response ->
+                        if (response.status == 200) {
+                            _resetPassUiState.value =
+                                ResetPasswordUIState(message = response.message)
+                            resetPasswordResponse = response
+                            _uiEvent.send(UiEvent.Success)
+                        } else {
+                            _uiEvent.send(
+                                UiEvent.ShowToast(
+                                    UiText.DynamicString(
+                                        response.message ?: AppConstants.DEFAULT_ERROR_MESSAGE
+                                    )
+                                )
+                            )
+                        }
                     }
                 }
             }
