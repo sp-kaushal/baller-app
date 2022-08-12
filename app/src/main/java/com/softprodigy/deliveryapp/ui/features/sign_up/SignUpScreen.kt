@@ -1,6 +1,7 @@
 package com.softprodigy.deliveryapp.ui.features.sign_up
 
 import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
@@ -13,12 +14,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,11 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.common.api.ApiException
 import com.softprodigy.deliveryapp.R
-import com.softprodigy.deliveryapp.data.GoogleUserModel
-import com.softprodigy.deliveryapp.data.response.LoginResponse
 import com.softprodigy.deliveryapp.common.isValidEmail
 import com.softprodigy.deliveryapp.common.isValidFullName
 import com.softprodigy.deliveryapp.common.isValidPassword
+import com.softprodigy.deliveryapp.data.GoogleUserModel
+import com.softprodigy.deliveryapp.data.response.LoginResponse
 import com.softprodigy.deliveryapp.data.response.SignUpResponse
 import com.softprodigy.deliveryapp.ui.features.components.AppButton
 import com.softprodigy.deliveryapp.ui.features.components.AppOutlineTextField
@@ -95,11 +92,6 @@ fun SignUpScreen(
             when (uiEvent) {
                 is SignUpChannel.OnLoginSuccess -> {
                     onGoogleClick.invoke(uiEvent.loginResponse)
-                is UiEvent.Success -> {
-                    vm.signupResponse?.let {
-                        onSuccessfulSignUp(it)
-                        onLoginClick()
-                    }
                 }
                 is SignUpChannel.ShowToast -> {
                     Toast.makeText(context, uiEvent.message.asString(context), Toast.LENGTH_LONG)
@@ -226,18 +218,6 @@ fun SignUpScreen(
                     }
                     pop()
                 }
-
-                    ClickableText(
-                        text = annotatedString,
-                        style = MaterialTheme.typography.h2,
-                        onClick = { offset ->
-                            annotatedString.getStringAnnotations(
-                                tag = "policy",
-                                start = offset,
-                                end = offset
-                            ).firstOrNull()?.let {
-                                Timber.i(it.item)
-                                uriHandler.openUri(it.item)
                 ClickableText(
                     text = annotatedString,
                     style = MaterialTheme.typography.h2,
@@ -251,14 +231,6 @@ fun SignUpScreen(
                             uriHandler.openUri(it.item)
 
                         }
-
-                            annotatedString.getStringAnnotations(
-                                tag = "terms",
-                                start = offset,
-                                end = offset
-                            ).firstOrNull()?.let {
-                                Timber.i(it.item)
-                                uriHandler.openUri(it.item)
                         annotatedString.getStringAnnotations(
                             tag = "terms",
                             start = offset,
@@ -269,17 +241,17 @@ fun SignUpScreen(
 
                         }
                     })
+
             }
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-
-            AppButton(
-                onClick = {
-                    vm.onEvent(SignUpUIEvent.Submit(name, email, password))
-                },
-                modifier = Modifier
-                    .fillMaxWidth(),
-                enabled = email.isValidEmail() && password.isValidPassword() && name.isValidFullName() && termsConditions
+                AppButton(
+                    onClick = {
+                        vm.onEvent(SignUpUIEvent.Submit(name, email, password))
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    enabled = email.isValidEmail() && password.isValidPassword() && name.isValidFullName() && termsConditions
             ) {
                 Text(text = stringResource(id = R.string.create_account))
             }
@@ -290,15 +262,12 @@ fun SignUpScreen(
                 },
                 onFacebookClick = { onFacebookClick.invoke() },
                 onFooterClick = { onLoginClick.invoke() })
-                onGoogleClick = { onGoogleClick() },
-                onFacebookClick = { onFacebookClick() },
-                onFooterClick = { onLoginClick() })
-
-        }
+            }
         if (signUpState.isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
-    }
+        }
+
 }
 
 @Preview("default", "rectangle")

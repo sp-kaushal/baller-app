@@ -10,9 +10,6 @@ import com.softprodigy.deliveryapp.common.*
 import com.softprodigy.deliveryapp.data.response.LoginResponse
 import com.softprodigy.deliveryapp.data.response.SignUpResponse
 import com.softprodigy.deliveryapp.ui.features.welcome.SocialLoginRepo
-import com.softprodigy.deliveryapp.R
-import com.softprodigy.deliveryapp.ui.features.login.LoginUIEvent
-import com.softprodigy.deliveryapp.ui.features.login.LoginUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -103,31 +100,9 @@ class SignupViewModel @Inject constructor(
             is SignUpUIEvent.Submit -> {
                 signUp(event.name, event.email, event.password)
             }
-
-                viewModelScope.launch {
-                    if (!name.value.isValidFullName()) {
-                        _signUpChannel.send(SignUpChannel.ShowToast(UiText.StringResource(R.string.enter_valid_full_name)))
-
-                    } else if (!email.value.isValidEmail()) {
-                        _signUpChannel.send(SignUpChannel.ShowToast(UiText.StringResource(R.string.enter_valid_email)))
-
-                    } else if (!password.value.isValidPassword()) {
-                        _signUpChannel.send(SignUpChannel.ShowToast(UiText.StringResource(R.string.password_error)))
-
-                    } else if (!termsAccepted.value) {
-                        _signUpChannel.send(SignUpChannel.ShowToast(UiText.StringResource(R.string.please_accept_tems)))
-
-                    } else {
-                        signUp()
-                    }
-                }
             }
         }
-    }
 
-    private fun signUp() {
-        }
-    }
 
     private fun signUp(name: String, email: String, password: String) {
         viewModelScope.launch {
@@ -180,7 +155,7 @@ class SignupViewModel @Inject constructor(
             }
         }
     }
-}
+    }
 sealed class SignUpChannel {
     data class ShowToast(val message: UiText) : SignUpChannel()
     data class OnSignUpSuccess(val signUpResponse: SignUpResponse) : SignUpChannel()

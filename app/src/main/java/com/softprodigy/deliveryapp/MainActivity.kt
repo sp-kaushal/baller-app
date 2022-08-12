@@ -36,6 +36,7 @@ import com.softprodigy.deliveryapp.ui.features.sign_up.SignUpScreen
 import com.softprodigy.deliveryapp.ui.features.welcome.WelcomeScreen
 import com.softprodigy.deliveryapp.ui.theme.DeliveryProjectStructureDemoTheme
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
