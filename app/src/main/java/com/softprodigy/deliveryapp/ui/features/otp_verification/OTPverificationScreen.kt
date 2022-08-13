@@ -55,7 +55,6 @@ import timber.log.Timber
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun OTPVerificationScreen(
-    onResetPassword: () -> Unit,
     onSuccess: (VerifyOtpResponse) -> Unit,
     token: String,
     email: String,
@@ -79,7 +78,6 @@ fun OTPVerificationScreen(
                 is UiEvent.Success -> {
                     vm.otpResponse?.let {
                         onSuccess(it)
-                        onResetPassword()
                     }
                 }
                 is UiEvent.GenerateOtp -> {
@@ -205,6 +203,7 @@ fun OTPVerificationScreen(
                 color = MaterialTheme.colors.primary,
                 modifier = Modifier
                     .clickable {
+                        setEditValue("")
                         vm.onEvent(
                             VerifyOtpUIEvent.ResendOtp(email = email)
                         )
