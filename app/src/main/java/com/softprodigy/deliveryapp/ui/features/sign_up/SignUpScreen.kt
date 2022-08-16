@@ -3,6 +3,7 @@ package com.softprodigy.deliveryapp.ui.features.sign_up
 import android.content.res.Configuration
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -13,12 +14,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,30 +31,53 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.delivery_app.core.util.UiEvent
+import com.google.android.gms.common.api.ApiException
 import com.softprodigy.deliveryapp.R
 import com.softprodigy.deliveryapp.common.isValidEmail
 import com.softprodigy.deliveryapp.common.isValidFullName
 import com.softprodigy.deliveryapp.common.isValidPassword
+import com.softprodigy.deliveryapp.data.GoogleUserModel
+import com.softprodigy.deliveryapp.data.response.LoginResponse
 import com.softprodigy.deliveryapp.data.response.SignUpResponse
 import com.softprodigy.deliveryapp.ui.features.components.AppButton
 import com.softprodigy.deliveryapp.ui.features.components.AppOutlineTextField
 import com.softprodigy.deliveryapp.ui.features.components.AppText
 import com.softprodigy.deliveryapp.ui.features.components.SocialSection
+import com.softprodigy.deliveryapp.ui.features.login.GoogleApiContract
 import com.softprodigy.deliveryapp.ui.theme.DeliveryProjectStructureDemoTheme
 import com.softprodigy.deliveryapp.ui.theme.spacing
+import timber.log.Timber
 
 @Composable
 fun SignUpScreen(
     vm: SignupViewModel = hiltViewModel(),
     onSuccessfulSignUp: (SignUpResponse) -> Unit,
-    onGoogleClick: () -> Unit,
+    onGoogleClick: (LoginResponse) -> Unit,
     onFacebookClick: () -> Unit,
     onLoginClick: () -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
     val signUpState = vm.signUpUIState.value
     val context = LocalContext.current
+
+
+    val authResultLauncher =
+        rememberLauncherForActivityResult(contract = GoogleApiContract()) { task ->
+            try {
+                val gsa = task?.getResult(ApiException::class.java)
+                if (gsa != null) {
+                    val googleUser = GoogleUserModel(
+                        email = gsa.email,
+                        name = gsa.displayName,
+                        id = gsa.id,
+                        token = gsa.idToken
+                    )
+                    vm.onEvent(SignUpUIEvent.OnGoogleClick(googleUser))
+                }
+            } catch (e: ApiException) {
+                Timber.i(e.toString())
+            }
+        }
 
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -70,17 +90,16 @@ fun SignUpScreen(
     LaunchedEffect(key1 = true) {
         vm.uiEvent.collect { uiEvent ->
             when (uiEvent) {
-                is UiEvent.Success -> {
-                    vm.signupResponse?.let {
-                        onSuccessfulSignUp(it)
-                        onLoginClick()
-                    }
+                is SignUpChannel.OnLoginSuccess -> {
+                    onGoogleClick.invoke(uiEvent.loginResponse)
                 }
-                is UiEvent.ShowToast -> {
+                is SignUpChannel.ShowToast -> {
                     Toast.makeText(context, uiEvent.message.asString(context), Toast.LENGTH_LONG)
                         .show()
                 }
-                else -> Unit
+                is SignUpChannel.OnSignUpSuccess -> {
+                    onSuccessfulSignUp.invoke(uiEvent.signUpResponse)
+                }
             }
         }
     }
@@ -199,7 +218,6 @@ fun SignUpScreen(
                     }
                     pop()
                 }
-
                 ClickableText(
                     text = annotatedString,
                     style = MaterialTheme.typography.h2,
@@ -213,7 +231,6 @@ fun SignUpScreen(
                             uriHandler.openUri(it.item)
 
                         }
-
                         annotatedString.getStringAnnotations(
                             tag = "terms",
                             start = offset,
@@ -224,31 +241,33 @@ fun SignUpScreen(
 
                         }
                     })
+
             }
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-
-            AppButton(
-                onClick = {
-                    vm.onEvent(SignUpUIEvent.Submit(name, email, password))
-                },
-                modifier = Modifier
-                    .fillMaxWidth(),
-                enabled = email.isValidEmail() && password.isValidPassword() && name.isValidFullName() && termsConditions
+                AppButton(
+                    onClick = {
+                        vm.onEvent(SignUpUIEvent.Submit(name, email, password))
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    enabled = email.isValidEmail() && password.isValidPassword() && name.isValidFullName() && termsConditions
             ) {
                 Text(text = stringResource(id = R.string.create_account))
             }
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
             SocialSection(
-                onGoogleClick = { onGoogleClick() },
-                onFacebookClick = { onFacebookClick() },
-                onFooterClick = { onLoginClick() })
-
-        }
+                onGoogleClick = {
+                    authResultLauncher.launch(0)
+                },
+                onFacebookClick = { onFacebookClick.invoke() },
+                onFooterClick = { onLoginClick.invoke() })
+            }
         if (signUpState.isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
-    }
+        }
+
 }
 
 @Preview("default", "rectangle")

@@ -4,13 +4,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.delivery_app.core.util.UiEvent
 import com.delivery_app.core.util.UiText
-import com.softprodigy.deliveryapp.common.*
-import com.softprodigy.deliveryapp.data.response.SignUpResponse
 import com.softprodigy.deliveryapp.R
-import com.softprodigy.deliveryapp.ui.features.login.LoginUIEvent
-import com.softprodigy.deliveryapp.ui.features.login.LoginUIState
+import com.softprodigy.deliveryapp.common.*
+import com.softprodigy.deliveryapp.data.response.LoginResponse
+import com.softprodigy.deliveryapp.data.response.SignUpResponse
+import com.softprodigy.deliveryapp.ui.features.welcome.SocialLoginRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -18,13 +17,32 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SignupViewModel @Inject constructor(private var signUpRepository: SignUpRepository) :
+class SignupViewModel @Inject constructor(
+    private var signUpRepository: SignUpRepository,
+    private var socialLoginRepo: SocialLoginRepo,
+) :
     ViewModel() {
-    private val _uiEvent = Channel<UiEvent>()
-    val uiEvent = _uiEvent.receiveAsFlow()
+    private val _signUpChannel = Channel<SignUpChannel>()
+    val uiEvent = _signUpChannel.receiveAsFlow()
 
     private val _signUpUiState = mutableStateOf(SignUpUIState())
     val signUpUIState: State<SignUpUIState> = _signUpUiState
+
+    private val _name = mutableStateOf("")
+    val name: State<String> = _name
+
+    private val _email = mutableStateOf("")
+    val email: State<String> = _email
+
+    private val _password = mutableStateOf("")
+    val password: State<String> = _password
+
+    private val _passwordVisibility = mutableStateOf(false)
+    val passwordVisibility: State<Boolean> = _passwordVisibility
+
+    private val _termsAccepted = mutableStateOf(false)
+    val termsAccepted: State<Boolean> = _termsAccepted
+
 
     var signupResponse: SignUpResponse? = null
         private set
@@ -32,12 +50,59 @@ class SignupViewModel @Inject constructor(private var signUpRepository: SignUpRe
     fun onEvent(event: SignUpUIEvent) {
         when (event) {
 
+            is SignUpUIEvent.NameChange -> {
+                _name.value = event.name
+            }
+
+            is SignUpUIEvent.EmailChange -> {
+                _email.value = event.email
+            }
+            is SignUpUIEvent.PasswordChange -> {
+                _password.value = event.password
+
+            }
+            is SignUpUIEvent.PasswordToggleChange -> {
+                _passwordVisibility.value = event.showPassword
+            }
+            is SignUpUIEvent.ConfirmTermsChange -> {
+                _termsAccepted.value = event.acceptTerms
+            }
+            is SignUpUIEvent.OnGoogleClick -> {
+                viewModelScope.launch {
+                    _signUpUiState.value = SignUpUIState(isLoading = true)
+                    when (val response = socialLoginRepo.loginWithGoogle(event.googleUser)) {
+                        is ResultWrapper.Success -> {
+                            _signUpChannel.send(
+                                SignUpChannel.OnLoginSuccess(
+                                    response.value
+                                )
+                            )
+                        }
+                        is ResultWrapper.GenericError -> {
+                            _signUpChannel.send(
+                                SignUpChannel.ShowToast(
+                                    UiText.DynamicString("${response.code} ${response.message}")
+                                )
+                            )
+                        }
+                        is ResultWrapper.NetworkError -> {
+                            _signUpChannel.send(
+                                SignUpChannel.ShowToast(
+                                    UiText.DynamicString("${response.message}")
+                                )
+                            )
+                        }
+                    }
+                    _signUpUiState.value = SignUpUIState(isLoading = false)
+
+                }
+            }
             is SignUpUIEvent.Submit -> {
                 signUp(event.name, event.email, event.password)
             }
-
+            }
         }
-    }
+
 
     private fun signUp(name: String, email: String, password: String) {
         viewModelScope.launch {
@@ -58,7 +123,7 @@ class SignupViewModel @Inject constructor(private var signUpRepository: SignUpRe
                             errorMessage = signUpResponse.message,
                             isLoading = false
                         )
-                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString(signUpResponse.message)))
+                    _signUpChannel.send(SignUpChannel.ShowToast(UiText.DynamicString(signUpResponse.message)))
                 }
                 is ResultWrapper.GenericError -> {
                     _signUpUiState.value =
@@ -67,7 +132,7 @@ class SignupViewModel @Inject constructor(private var signUpRepository: SignUpRe
                             errorMessage = "${signUpResponse.code} ${signUpResponse.message}",
                             isLoading = false
                         )
-                    _uiEvent.send(UiEvent.ShowToast(UiText.DynamicString("${signUpResponse.code} ${signUpResponse.message}")))
+                    _signUpChannel.send(SignUpChannel.ShowToast(UiText.DynamicString("${signUpResponse.code} ${signUpResponse.message}")))
                 }
                 is ResultWrapper.Success -> {
 
@@ -75,13 +140,10 @@ class SignupViewModel @Inject constructor(private var signUpRepository: SignUpRe
                         if (response.status == 200) {
                             _signUpUiState.value =
                                 SignUpUIState(user = response.userInfo)
-
-                            signupResponse = response
-
-                            _uiEvent.send(UiEvent.Success)
+                            _signUpChannel.send(SignUpChannel.OnSignUpSuccess(response))
                         } else {
-                            _uiEvent.send(
-                                UiEvent.ShowToast(
+                            _signUpChannel.send(
+                                SignUpChannel.ShowToast(
                                     UiText.DynamicString(
                                         response.message ?: AppConstants.DEFAULT_ERROR_MESSAGE
                                     )
@@ -93,5 +155,10 @@ class SignupViewModel @Inject constructor(private var signUpRepository: SignUpRe
             }
         }
     }
-}
+    }
+sealed class SignUpChannel {
+    data class ShowToast(val message: UiText) : SignUpChannel()
+    data class OnSignUpSuccess(val signUpResponse: SignUpResponse) : SignUpChannel()
+    data class OnLoginSuccess(val loginResponse: LoginResponse) : SignUpChannel()
 
+}
