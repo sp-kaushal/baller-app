@@ -105,6 +105,7 @@
         <entry key="app/src/main/res/drawable/ic_login.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_sign_up.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_welcome.xml" value="0.133" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.22" />
       </map>
     </option>
   </component>

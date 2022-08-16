@@ -3,6 +3,7 @@ package com.softprodigy.deliveryapp.ui.features.welcome
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -12,6 +13,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,8 +24,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
 import com.google.android.gms.common.api.ApiException
+import com.softprodigy.deliveryapp.LocalFacebookCallbackManager
 import com.softprodigy.deliveryapp.R
+import com.softprodigy.deliveryapp.common.CustomFBManager
+import com.softprodigy.deliveryapp.common.FacebookUserProfile
+import com.softprodigy.deliveryapp.data.FacebookUserModel
 import com.softprodigy.deliveryapp.data.GoogleUserModel
 import com.softprodigy.deliveryapp.data.response.LoginResponse
 import com.softprodigy.deliveryapp.ui.features.components.AppButton
@@ -45,8 +55,38 @@ fun WelcomeScreen(
     onLoginClick: () -> Unit,
 
     ) {
+
+    val callbackManager = LocalFacebookCallbackManager.current
     val context = LocalContext.current
     val welcomeUIState = vm.welcomeUiState.value
+
+    DisposableEffect(Unit) {
+
+        LoginManager.getInstance().registerCallback(
+            callbackManager,
+            object : FacebookCallback<LoginResult> {
+                override fun onSuccess(loginResult: LoginResult) {
+
+                    CustomFBManager.getFacebookUserProfile(loginResult.accessToken, object : FacebookUserProfile {
+                        override fun onFacebookUserFetch(fbUser: FacebookUserModel) {
+                            Timber.i("FacebookUserModel-- $fbUser")
+                        }
+                    })
+                }
+
+                override fun onCancel() {
+                    println("onCancel")
+                }
+
+                override fun onError(exception: FacebookException) {
+                    println("onError $exception")
+                }
+            }
+        )
+        onDispose {
+            LoginManager.getInstance().unregisterCallback(callbackManager)
+        }
+    }
     val authResultLauncher =
         rememberLauncherForActivityResult(contract = GoogleApiContract()) { task ->
             vm.welcomeUiState.value.isDataLoading = true
@@ -61,6 +101,7 @@ fun WelcomeScreen(
                     )
                     vm.onEvent(WelcomeUIEvent.OnGoogleClick(googleUser))
                 }
+
             } catch (e: ApiException) {
                 Timber.i(e.toString())
             }
@@ -134,7 +175,12 @@ fun WelcomeScreen(
                 vm.welcomeUiState.value.isDataLoading = true
                 authResultLauncher.launch(0)
             }, onFacebookClick = {
-
+                LoginManager.getInstance()
+                    .logInWithReadPermissions(
+                        context as ActivityResultRegistryOwner,
+                        callbackManager,
+                        listOf("public_profile", "email")
+                    )
             }, onFooterClick = {
                 onLoginClick.invoke()
             })

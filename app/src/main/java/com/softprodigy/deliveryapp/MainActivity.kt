@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.facebook.CallbackManager
 import com.softprodigy.deliveryapp.common.Route
 import com.softprodigy.deliveryapp.common.Route.FORGOT_PASSWORD_SCREEN
 import com.softprodigy.deliveryapp.common.Route.HOME_SCREEN
@@ -33,8 +36,12 @@ import com.softprodigy.deliveryapp.ui.theme.DeliveryProjectStructureDemoTheme
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
+val LocalFacebookCallbackManager =
+    staticCompositionLocalOf<CallbackManager> { error("No CallbackManager provided") }
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private var callbackManager = CallbackManager.Factory.create();
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +53,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    NavControllerComposable()
+                    CompositionLocalProvider(
+                        LocalFacebookCallbackManager provides callbackManager
+                    ) {
+                        NavControllerComposable()
+                    }
                 }
             }
         }
